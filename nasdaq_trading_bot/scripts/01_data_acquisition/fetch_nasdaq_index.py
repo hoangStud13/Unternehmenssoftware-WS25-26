@@ -29,6 +29,22 @@ START_DATE = END_DATE - timedelta(days=5*365) # Approx 5 years
 
 print(f"Fetching 1m bars for {SYMBOL} from {START_DATE} to {END_DATE}...")
 
+# Define data directory relative to project root
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
+data_dir = os.path.join(project_root, 'data')
+
+os.makedirs(data_dir, exist_ok=True)
+
+# Define output paths
+output_parquet = os.path.join(data_dir, 'nasdaq100_index_1m.parquet')
+output_csv = os.path.join(data_dir, 'nasdaq100_index_1m.csv')
+
+# Check if data already exists
+if os.path.exists(output_parquet) and os.path.exists(output_csv):
+    print(f"Data already exists at:\n- {output_parquet}\n- {output_csv}\nSkipping download.")
+    exit(0)
+
 # Create request
 request = StockBarsRequest(
     symbol_or_symbols=SYMBOL,
@@ -50,16 +66,10 @@ try:
     if 'symbol' in df.columns:
         df.drop(columns=['symbol'], inplace=True)
     
-    # Create data directory if it doesn't exist
-    data_dir = 'data'
-    os.makedirs(data_dir, exist_ok=True)
-
     # Save to Parquet
-    output_parquet = os.path.join(data_dir, 'nasdaq100_index_1m.parquet')
     df.to_parquet(output_parquet, index=False)
     
     # Save to CSV
-    output_csv = os.path.join(data_dir, 'nasdaq100_index_1m.csv')
     df.to_csv(output_csv, index=False)
     
     print(f"Successfully saved {len(df)} rows to:\n- {output_parquet}\n- {output_csv}")
