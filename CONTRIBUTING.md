@@ -177,10 +177,4 @@ Beim Review achten wir auf:
 - Bei Fragen oder Problemen: Discord/Slack/E-Mail
 - Regelmäßige Team-Meetings zur Abstimmung
 
-## Fragen?
 
-Bei Unklarheiten wende dich an das Team. Wir helfen gerne!
-
----
-
-Danke für deine Mitarbeit! 🚀
