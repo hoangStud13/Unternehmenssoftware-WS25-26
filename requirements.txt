@@ -2,3 +2,6 @@ alpaca-py
 python-dotenv
 pandas
 pytz
+types-pytz
+types-PyYAML
+pyarrow
