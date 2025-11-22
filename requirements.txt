@@ -5,3 +5,5 @@ pytz
 types-pytz
 types-PyYAML
 pyarrow
+matplotlib
+seaborn
