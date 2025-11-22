@@ -1,0 +1,14 @@
+# sensitive Files
+.env
+*.env
+*.secret
+
+# PyCharm
+.idea
+
+# logs
+*.log
+logs/
+
+# Data - keine Dateien die wir fetchen, zu groß
+data/
