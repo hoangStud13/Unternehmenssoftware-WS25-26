@@ -43,9 +43,6 @@ Wir arbeiten mit folgender Branch-Struktur:
 
 - `main` - Produktionsreifer, stabiler Code
 - `develop` - Entwicklungsbranch für Integration
-- `feature/*` - Neue Features (z.B. `feature/order-execution`)
-- `bugfix/*` - Bugfixes (z.B. `bugfix/api-connection`)
-- `docs/*` - Dokumentationsänderungen
 
 ### Einen neuen Branch erstellen
 
@@ -86,7 +83,7 @@ git commit -m "docs: README mit Installationsanleitung aktualisiert"
 1. Stelle sicher, dass dein Code funktioniert und getestet ist
 2. Pushe deinen Branch:
    ```bash
-   git push origin feature/dein-feature-name
+   git push origin developer/neue-änderung-name
    ```
 3. Erstelle einen Pull Request auf GitHub von deinem Branch nach `develop`
 4. Füge eine aussagekräftige Beschreibung hinzu
@@ -141,15 +138,16 @@ def calculate_profit(entry_price, exit_price, quantity):
 
 ```
 trading-bot/
-├── src/
-│   ├── api/          # API-Integrationen
-│   ├── strategies/   # Trading-Strategien
-│   ├── utils/        # Hilfsfunktionen
-│   └── main.py       # Haupteinstiegspunkt
+|── images/        # Bilder von z.B. Plots
+├── scripts/                    # Alle Skripts zum trainieren des ML Modells, von 01-Data-Acquisition bis 09-Deployment
+│   ├── 01_data_acquisition/          
+│   ├── 02_data_understanding/   
+│   ├── 03.../        
 ├── tests/            # Unit-Tests
 ├── docs/             # Dokumentation
-├── requirements.txt  # Python-Dependencies
-└── README.md         # Projektübersicht
+requirements.txt  # Python-Dependencies
+CONTRIBUTING.md   # Zusammenarbeitübersicht
+README.md         # Projektübersicht
 ```
 
 ## Wichtige Hinweise
