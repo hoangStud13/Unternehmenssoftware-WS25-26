@@ -2,12 +2,87 @@
 
 ## Problem Definition:
 
-### Target
+Wir möchten für QQQ vorhersagen, wie sich der Preis in den nächsten
+1, 3, 5, 10 und 15 Minuten bewegt.
+Das Ziel ist eine kurzfristige Daytrading-Prognose, mit der man Trends früh erkennt.
+
+Wir nutzen dafür Minuten-Daten und News, um Muster wie Momentum, Volatilität oder News-Impulse zu erkennen.
+
+### Ziel
+
+Ein Modell zu entwickeln, das:
+
+- Preis- und Volumenmuster erkennt
+
+- News-Einfluss kurzfristig berücksichtigt
+
+- zuverlässig abschätzt, wohin sich QQQ in den nächsten Minuten bewegt
+
+Damit können wir präzisere Daytrading-Signale erzeugen.
+
+### Input   
+
+Wir verwenden 1-Minuten-Bars:
+
+- `timestamp`
+
+- `open`
+
+- `high`
+
+- `low`
+
+- `close`
+
+- `volume`
+
+- `trade_count`
+
+- `vwap`
+
+Zusätzlich nutzen wir News:
+
+- `news_time`
+
+- `sentiment`
 
 ### Input Features
 
-## Procedure Overview:
+#### Preis- und Trendfeatures
 
+- 1-, 5- und 15-Minuten Returns
+
+- EMA(5) und EMA(20)
+
+- Unterschied zwischen kurzen und langen EMAs
+
+- Realisierte Volatilität der letzten 10 Minuten
+
+- High-Low-Range der aktuellen Minute
+
+#### Volumen-Features
+
+- Volumen-Z-Score über die letzten 30 Minuten
+
+- Volumen pro Trade
+
+#### News-Feature
+
+- Effektives News-Sentiment (letzte News, abgeschwächt je älter sie ist)
+
+### Output
+
+Wir erstellen für jede Minute fünf Zielwerte:
+
+- erwartete Preisänderung in 1 Minute
+
+- erwartete Preisänderung in 3 Minuten
+
+- erwartete Preisänderung in 5 Minuten
+
+- erwartete Preisänderung in 10 Minuten
+
+- erwartete Preisänderung in 15 Minuten
 ---
 
 ## 1 - Data Acquisition
@@ -56,7 +131,7 @@ Ruft historische 1-Minuten-Kerzendaten für NASDAQ-100 (QQQ) über die Alpaca Da
 ##### Funktionen
 - **Datenquelle**: Alpaca Market Data API (v2)
 - **Zeitraum**: 2020-11-23 bis 2025-11-20
-- **Symbol**: QQQ (Invesco QQQ Trust)
+- **Symbol**: QQQ (Invesco QQQ Trust), NDX (Nasdaq-100 Index)
 - **Zeitraum**: 1 Minute
 - **Kursanpassung**: Alle Anpassungen (Splits, Dividenden)
 - **Ausgabe**: Parquet- und CSV-Dateien mit OHLCV-Daten
@@ -65,25 +140,25 @@ Ruft historische 1-Minuten-Kerzendaten für NASDAQ-100 (QQQ) über die Alpaca Da
 ##### Request Parameter
 
 | Parameter         | Typ       | Beschreibung                            |
-| ----------------- | --------- | --------------------------------------- |
-| symbol_or_symbols | string    | Abgefragtes Symbol, z. B. `"QQQ"`       |
-| timeframe         | TimeFrame | Zeitintervall, z. B. `TimeFrame.Minute` |
-| adjustment        | enum      | Kursanpassung (`Adjustment.ALL`)        |
-| start             | datetime  | Startzeitpunkt                          |
-| end               | datetime  | Endzeitpunkt                            |
+| ----------------- | --------- |-----------------------------------------|
+| `symbol_or_symbols`| string    | Abgefragtes Symbol, z. B. `"QQQ"`       |
+| `timeframe`       | TimeFrame | Zeitintervall, z. B. `TimeFrame.Minute` |
+| `adjustment`      | enum      | Kursanpassung (`Adjustment.ALL`)        |
+| `start`           | datetime  | Startzeitpunkt  (`START_DATE`)          |
+| `end`             | datetime  | Endzeitpunkt          (`END_DATE`)      |
 
 ##### Bar-Datenstruktur - Spaltenbeschreibung
 
 | Spalte        | Beschreibung                                                                 |
 |---------------|-------------------------------------------------------------------------------|
-| timestamp     | Zeitstempel der Kerze (z. B. 1min), inkl. Zeitzone (ISO-Format).             |
-| open          | Eröffnungspreis der Periode.                                                  |
-| high          | Höchster Preis der Periode.                                                   |
-| low           | Tiefster Preis der Periode.                                                   |
-| close         | Schlusskurs der Periode.                                                      |
-| volume        | Gehandeltes Volumen innerhalb der Periode.                                    |
-| trade_count   | Anzahl der Trades in dieser Periode.                                          |
-| vwap          | Volume Weighted Average Price – volumengewichteter Durchschnittspreis.        |
+| `timestamp`   | Zeitstempel der Kerze (z. B. 1min), inkl. Zeitzone (ISO-Format).             |
+| `open`        | Eröffnungspreis der Periode.                                                  |
+| `high`        | Höchster Preis der Periode.                                                   |
+| `low`         | Tiefster Preis der Periode.                                                   |
+| `close`       | Schlusskurs der Periode.                                                      |
+| `volume`      | Gehandeltes Volumen innerhalb der Periode.                                    |
+| `trade_count` | Anzahl der Trades in dieser Periode.                                          |
+| `vwap`        | Volume Weighted Average Price – volumengewichteter Durchschnittspreis.        |
 
 #### NASDAQ News Fetcher (Alpaca API)
 
@@ -106,13 +181,13 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 
 ##### Request Parameter
 
-| Parameter | Standardwert         | Beschreibung                                 |
-| --------- | -------------------- | -------------------------------------------- |
-| `start`   | 5 Jahre vor Enddatum | Startdatum für die Datenabfrage              |
-| `end`     | Aktuelles Datum      | Enddatum für die Datenabfrage                |
-| `symbols` | `QQQ, NDX`           | Zu ladende Symbole / Assets                  |
-| `limit`   | 50                   | Anzahl der Artikel/Bars pro Anfrage          |
-| `sort`    | DESC                 | Sortierreihenfolge (`DESC` = neueste zuerst) |
+| Parameter | Standardwert       | Beschreibung                                |
+| --------- | ------------------ | ------------------------------------------- |
+| `start`   | 5 Jahre vor Enddatum | Startdatum für die Datenabfrage             |
+| `end`     | Aktuelles Datum    | Enddatum für die Datenabfrage               |
+| `symbols` | QQQ, NDX           | Zu ladende Symbole / Assets                 |
+| `limit`   | 50                 | Anzahl der Artikel/Bars pro Anfrage         |
+| `sort`    | DESC               | Sortierreihenfolge (neueste zuerst) |
 
 
 ##### News-Datenstruktur - Spaltenbeschreibung
