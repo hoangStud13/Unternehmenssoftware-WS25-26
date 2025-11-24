@@ -1,9 +1,9 @@
 import os
+
 import pandas as pd
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import numpy as np
 from tqdm import tqdm
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # Configuration
 current_dir = os.path.dirname(os.path.abspath(__file__))
