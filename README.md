@@ -116,6 +116,8 @@ Die Daten werden mit fester Endzeit geladen, um reproduzierbare Ergebnisse zu ge
 
 [scripts/01_data_acquisition/fetch_news.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_news.py)
 
+### News-Daten Beispiel
+
 | id | headline | summary | author | created_at | updated_at | url | symbols | source |
 |----|----------|----------|--------|------------|------------|-----|----------|--------|
 | 48963075 | S&P And Nasdaq Move Higher After Hours Foll… | nan | Benzinga Newsdesk | 2025-11-19T21:24:34Z | 2025-11-19T21:24:35Z | https://www.benzinga.com/general/macro-news/... | ['QQQ','SPY'] | benzinga |
