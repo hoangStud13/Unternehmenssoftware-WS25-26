@@ -116,8 +116,6 @@ Die Daten werden mit fester Endzeit geladen, um reproduzierbare Ergebnisse zu ge
 
 [scripts/01_data_acquisition/fetch_news.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_news.py)
 
-### News-Daten Beispiel
-
 | id | headline | summary | author | created_at | updated_at | url | symbols | source |
 |----|----------|----------|--------|------------|------------|-----|----------|--------|
 | 48963075 | S&P And Nasdaq Move Higher After Hours Foll… | nan | Benzinga Newsdesk | 2025-11-19T21:24:34Z | 2025-11-19T21:24:35Z | https://www.benzinga.com/general/macro-news/... | ['QQQ','SPY'] | benzinga |
@@ -141,34 +139,6 @@ Die Daten werden mit fester Endzeit geladen, um reproduzierbare Ergebnisse zu ge
 | 48987619 | How To Trade SPY, Top Tech Stocks Using T… | … | RIPS | 2025-11-17T13:35:08Z | 2025-11-17T13:35:08Z | https://www.benzinga.com/etfs/sectors/… | ['AAPL','GOOGL','META','MSFT','NVDA','QQQ'] | benzinga |
 | 48982486 | Howard Marks Draws Parallels Between AI Bo… | Legendary investor Howard Marks warns of p… | Rishabh Mishra | 2025-11-17T12:10:47Z | 2025-11-17T12:10:48Z | https://www.benzinga.com/market… | ['FDN','FTEC','IGM','IXN','IVV','MAGS','QQQ…'] | benzinga |
 | 48920708 | Paul Singer's Elliott Targets Gold, Consumer S… | Paul Singer&#39;s Elliott Investment Managem… | Rishabh Mishra | 2025-11-17T09:53:23Z | 2025-11-17T09:53:23Z | https://www.benzinga.com/markets/hedg… | ['GDX','LBRDK','QQQ','SMH','SPY','WDC','X…'] | benzinga |
-
-
-
-### News-Daten Beispiel mit Sentiment
-
-| id | headline | summary | author | created_at | updated_at | url | symbols | source | sentiment_score |
-|----|----------|----------|--------|------------|------------|-----|----------|--------|-----------------|
-| 48963075 | S&P And Nasdaq Move Higher After Hours Foll… | nan | Benzinga Newsdesk | 2025-11-19T21:24:34Z | 2025-11-19T21:24:35Z | https://www.benzinga.com/general/macro-news/... | ['QQQ','SPY'] | benzinga | -0.88333 |
-| 48961392 | AI Powerhouses Or Small-Cap Rebound? ETF… | Morgan Stanley&#39;s 7,800 S&amp;P 500 cal… | Chandrima Sanyal | 2025-11-19T20:38:40Z | 2025-11-19T20:38:41Z | https://www.benzinga.com/etfs/broad-u-s-e… | ['AAPL','EQL','EQWL','IJR','IWM','MSFT','QQQ'] | benzinga | 0.82979 |
-| 48956738 | Tech Edges Up Ahead Of Nvidia's Earnings, Bi… | All eyes are on Nvidia Corp. (NASDAQ:NVDA)… | Piero Cingari | 2025-11-19T17:45:59Z | 2025-11-19T17:46:00Z | https://www.benzinga.com/news/25/11/489… | ['ACM','AMTM','AS','BRBR','BTC','BTCUSD'] | benzinga | 0.16690 |
-| 48944099 | Stock Market Today: Dow Jones, S&P 500 Fut… | Editor's note: The future prices of benchmar… | Rishabh Mishra | 2025-11-19T13:03:42Z | 2025-11-19T13:03:47Z | https://www.benzinga.com/markets/equities… | ['IBUD','BTCUSD','CEG','DASH','NVDA','QQQ'] | benzinga | -0.65593 |
-| 48925309 | How To Trade SPY, Top Tech Stocks Using T… | … | RIPS | 2025-11-19T15:09:28Z | 2025-11-19T13:23:18Z | https://www.benzinga.com/Opinion/25/11/489… | ['AAPL','GOOGL','META','MSFT','NVDA','QQQ'] | benzinga | 0.88211 |
-| 48943359 | Top Economist Warns Trump Tariffs Effectiv… | Yale Budget Lab: 2025 Trump tariffs hit poor… | Rishabh Mishra | 2025-11-19T08:49:17Z | 2025-11-19T08:49:18Z | https://www.benzinga.com/markets/economi… | ['QQQ','SPY'] | benzinga | 0.00157 |
-| 48936136 | Nvidia's Big Earnings Test: ETF Market Braces… | Nvidia&#39;s earnings could spark a record $… | Chandrima Sanyal | 2025-11-18T20:37:51Z | 2025-11-18T20:37:52Z | https://www.benzinga.com/etfs/25/11/489… | ['NVDA','QQQ','SPY','VOO'] | benzinga | -0.10740 |
-| 48932450 | Tech Stocks Drop, Pharma Gains As Sector R… | Wall Street endured another wave of selling… | Piero Cingari | 2025-11-18T18:15:12Z | 2025-11-18T15:11Z | https://www.benzinga.com/market… | ['AMGN','AMZN','BTCUSD','DECK','DIA','FC…'] | benzinga | 0.00776 |
-| 48930265 | Nvidia Sneezed, All ETFs Shivered — Is This t… | Here&#39;s how ETFs are positioned as inves… | Chandrima Sanyal | 2025-11-18T17:06:17Z | 2025-11-18T17:06:18Z | https://www.benzinga.com/etfs/sectors-etfs… | ['BUG','CIBR','GOOGL','IGV','META','MSFT','…'] | benzinga | 0.84123 |
-| 48929811 | Nvidia Earnings Will Determine Market Directio… | Key Earnings Data | The Arora Report | 2025-11-18T15:59:41Z | 2025-11-18T15:59:42Z | https://www.benzinga.com/market… | ['AAPL','AMZN','BTCUSD','GLD','GOOG','HD…'] | benzinga | 0.15439 |
-| 48926431 | Cloudflare Stumbled — And Tech Stocks Exte… | Cloudflare outage hit major platforms and tec… | Piero Cingari | 2025-11-18T15:28:09Z | 2025-11-18T15:28:09Z | https://www.benzinga.com/news/25/11/489… | ['AIQ','ALAB','AMD','AMZN','APP','ARM','CL…'] | benzinga | 0.01179 |
-| 48918136 | Stock Market Today: Dow Jones, S&P 500, Na… | Editor&#39;s note: The future prices of benchm… | Rishabh Mishra | 2025-11-18T13:27:46Z | 2025-11-18T13:28:09Z | https://www.benzinga.com/markets/equities… | ['AVTR','AXTA','BTCUSD','HD','HP','MOH',…] | benzinga | -0.22336 |
-| 48916726 | Fed's Waller Backs Rate Cut In December Amid… | Fed&#39;s Waller supports a December rate c… | Rishabh Mishra | 2025-11-18T03:23:08Z | 2025-11-18T03:23:09Z | https://www.benzinga.com/markets/macro-e… | ['DIA','NVDA','QQQ','SPY'] | benzinga | 0.79376 |
-| 48970509 | Nvidia Q3 Preview: Analysts Predict Beat And … | Nvidia&#39;s Q3 earnings on Wednesday repr… | Chris Katje | 2025-11-17T19:08:09Z | 2025-11-17T19:08:10Z | https://www.benzinga.com/trading-ideas/… | ['DIA','NVDA','QQQ','SPY'] | benzinga | 0.95010 |
-| 48905126 | Alphabet Rallies To Record Highs, Bitcoin F… | Wall Street kicked off the new week on a flat n… | Piero Cingari | 2025-11-17T17:40:53Z | 2025-11-17T17:40:54Z | https://www.benzinga.com/markets/equities… | ['ALB','BTCUSD','CNC','COIN','DELL','DIA','…'] | benzinga | -0.05101 |
-| 48936057 | Dip Buyers Save The Stock Market; Hindenbur… | Dip Buyers Save The Market | The Arora Report | 2025-11-17T16:54:55Z | 2025-11-17T16:54:55Z | https://www.benzinga.com/etfs/d… | ['AAPL','AMZN','APLD','BRK','BTCUSD','GLD…'] | benzinga | 0.62465 |
-| 48930233 | US ETF Inflows Hit Record Pace—VOO, SPY,… | VOO, SPY and QQQ are driving record U.S. ET… | Chandrima Sanyal | 2025-11-17T16:41:43Z | 2025-11-17T16:41:43Z | https://www.benzinga.com/etfs/broad-u-s-e… | ['AGG','BND','GLD','GOVT','IBIT','IEF','QQQ…'] | benzinga | -0.84088 |
-| 48931843 | Stock Market Today: Dow, Nasdaq Futures Ri… | Editor’s Note: The future prices of benchm… | Rishabh Mishra | 2025-11-17T13:36:33Z | 2025-11-17T16:31:43Z | https://www.benzinga.com/Opinion/25/11/489… | ['BA','BRK','BTCUSD','DELL','GOOG','QQQ'] | benzinga | -0.90077 |
-| 48987619 | How To Trade SPY, Top Tech Stocks Using T… | … | RIPS | 2025-11-17T13:35:08Z | 2025-11-17T13:35:08Z | https://www.benzinga.com/etfs/sectors/… | ['AAPL','GOOGL','META','MSFT','NVDA','QQQ'] | benzinga | 0.88211 |
-| 48982486 | Howard Marks Draws Parallels Between AI Bo… | Legendary investor Howard Marks warns of p… | Rishabh Mishra | 2025-11-17T12:10:47Z | 2025-11-17T12:10:48Z | https://www.benzinga.com/market… | ['FDN','FTEC','IGM','IXN','IVV','MAGS','QQQ…'] | benzinga | 0.66488 |
-| 48920708 | Paul Singer's Elliott Targets Gold, Consumer S… | Paul Singer&#39;s Elliott Investment Managem… | Rishabh Mishra | 2025-11-17T09:53:23Z | 2025-11-17T09:53:23Z | https://www.benzinga.com/markets/hedg… | ['GDX','LBRDK','QQQ','SMH','SPY','WDC','X…'] | benzinga | -0.89794 |
 
 ### 1.1 API - Dokumentation
 
@@ -244,8 +214,6 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 
 ##### News-Datenstruktur - Spaltenbeschreibung
 
-##### News 
-
 | Spalte       | Beschreibung                                    |
 |:-------------|:------------------------------------------------|
 | `id`         | Eindeutige ID des Artikels                      |
@@ -257,24 +225,6 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 | `url`        | Link zum vollständigen Artikel                  |
 | `symbols`    | Liste der zugehörigen Tickersymbole             |
 | `source`     | Quelle                                          |
-
-##### News mit Sentiment-Score
-
-| Spalte            | Beschreibung                                      |
-|:------------------|:--------------------------------------------------|
-| `id`              | Eindeutige ID des Artikels                        |
-| `headline`        | Titel des Nachrichtenartikels                     |
-| `summary`         | Kurze Zusammenfassung des Inhalts                 |
-| `author`          | Autor oder Quelle des Artikels                    |
-| `created_at`      | Erstellungsdatum und -uhrzeit (ISO 8601 Format)   |
-| `updated_at`      | Datum und Uhrzeit der letzten Aktualisierung      |
-| `url`             | Link zum vollständigen Artikel                    |
-| `symbols`         | Liste der zugehörigen Tickersymbole               |
-| `source`          | Quelle                                            |
-| `sentiment score` | Sentiment-Score des jeweiligen Artikels |
-
-
-
 ---
 
 ## 2 - Data Understanding
