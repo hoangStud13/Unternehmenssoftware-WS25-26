@@ -1,3 +1,6 @@
+tqdm
+torch
+transformers
 alpaca-py
 python-dotenv
 pandas

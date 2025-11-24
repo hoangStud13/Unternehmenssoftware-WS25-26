@@ -1,5 +1,0 @@
-alpaca-py
-pandas
-pyarrow
-python-dotenv
-pytz
