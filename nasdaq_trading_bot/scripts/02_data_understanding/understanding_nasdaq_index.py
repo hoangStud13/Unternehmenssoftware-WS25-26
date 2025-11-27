@@ -70,7 +70,7 @@ print(data.isnull().sum())
 plt.hist(data["open"],bins=30, color="blue",edgecolor="black")
 plt.title("Verteilung der Open-Preise")
 plt.xlabel("Preis in USD")
-plt.ylabel("Anzahl der Tage")
+plt.ylabel("Anzahl der Datensätze")
 plt.savefig(f"{images_dir}/02_Verteilung_analysieren.png")
 
 
@@ -79,14 +79,16 @@ line_chart_df = data[['timestamp', 'open']].copy()
 line_chart_df['timestamp'] = pd.to_datetime(line_chart_df['timestamp'])
 line_chart_df.set_index('timestamp', inplace=True)
 
+# Optional: Wochenenden raus
+line_chart_df = line_chart_df[line_chart_df.index.dayofweek < 5]
 
-line_chart_df_weekly = line_chart_df['open'].resample('W').mean()
+line_chart_df_weekly = line_chart_df['open'].resample('W').first()
 
 weekly_returns = line_chart_df_weekly.pct_change().dropna()
 
 plt.figure(figsize=(12,6))
 plt.plot(line_chart_df_weekly.index, line_chart_df_weekly.values, label='Wöchentlicher Open-Preis', color='blue')
-plt.title("Wöchentliche Open-Preise")
+plt.title("Durchschnittliche Wöchentliche Open-Preise (Mo-Fr)")
 plt.xlabel("Datum")
 plt.ylabel("Open-Preis")
 plt.grid(True)
@@ -128,6 +130,20 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig(f"{images_dir}/02_moving_average.png")
 
+
+data['timestamp'] = pd.to_datetime(data['timestamp'])
+data = data.set_index('timestamp')
+
+
+plt.figure(figsize=(12,4))
+plt.plot(data.index, data['volume'])
+plt.title("Handelsvolumen über die Zeit")
+plt.xlabel("Zeit in Tagen")
+plt.ylabel("Volumen in Mio. Shares")
+plt.grid(True)
+plt.savefig(f"{images_dir}/02_volume_over_time.png")
+# Zeigt Phasen mit ungewöhlichem hohem/geringem Volumen
+# Relevant für spätere Volumen features
 
 
 
