@@ -102,7 +102,7 @@ class FeatureBuilder:
         """
         print("Aligning news data...")
 
-        news_file = os.path.join("nasdaq_trading_bot\data\nasdaq100_index_1m.csv", 'nasdaq_news_5y_with_sentiment.csv')
+        news_file = os.path.join(FeatureBuilder.data_dir, 'nasdaq_news_5y_with_sentiment.csv')
         
         if not os.path.exists(news_file):
             print(f"Warning: News file not found at {news_file}. Skipping news alignment.")
