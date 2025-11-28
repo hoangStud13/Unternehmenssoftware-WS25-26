@@ -12,12 +12,14 @@ class FeatureBuilder:
     def __init__(
         self,
         df: pd.DataFrame,
+        ema_windows: List[int],
         return_windows: List[int],
         price_col: str = 'open',
         timestamp_col: str = 'timestamp',
         news_col: str = 'sentiment'
     ) -> None:
         self.df = df.copy()  # DataFrame intern speichern
+        self.ema_windows = ema_windows
         self.return_windows = return_windows
         self.price_col = price_col
         self.timestamp_col = timestamp_col
@@ -30,11 +32,18 @@ class FeatureBuilder:
 
     # Beispiel: einfache Returns berechnen
     def _add_simple_return(self):
-        return 0
+        for window in self.return_windows:
+            self.df[f'simple_return_{window}m'] = self.df[self.price_col].pct_change(window)
+
 
     # EMA
     def _calculate_ema(self, span: int = 10):
-        return 0
+        for window in self.ema_windows:
+            self.df[f'ema_{window}'] = self.df[self.price_col].ewm(span=window,adjust=False).mean()
+
+    # EMA(5) - EMA(20)
+    def _calculate_ema_diff(self):
+        self.df['ema_diff'] = self.df['ema_5'] - self.df['ema_20']
 
     # Z-Score
     def _calculate_z_score(self, window: int = 20):
