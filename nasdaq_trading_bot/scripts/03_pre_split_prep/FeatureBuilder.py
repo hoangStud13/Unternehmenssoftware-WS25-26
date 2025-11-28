@@ -102,7 +102,7 @@ class FeatureBuilder:
         """
         print("Aligning news data...")
 
-        news_file = os.path.join(data_dir, 'nasdaq_news_5y_with_sentiment.csv')
+        news_file = os.path.join("nasdaq_trading_bot\data\nasdaq100_index_1m.csv", 'nasdaq_news_5y_with_sentiment.csv')
         
         if not os.path.exists(news_file):
             print(f"Warning: News file not found at {news_file}. Skipping news alignment.")
@@ -188,9 +188,9 @@ class FeatureBuilder:
         # Alle zusammenführen
         columns_to_keep = cols_return + cols_ema + other_cols
         df_features = self.df[columns_to_keep]
-        output_parquet = os.path.join(data_dir, 'nasdaq100_index_1m_features.parquet')
-        output_csv = os.path.join(data_dir, 'nasdaq100_index_1m_features.csv')
-        df_features.to_csv(output_csv, index=False)   # index=False
-        df_features.to_parquet(output_parquet, index=False)
+        output_parquet = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.parquet')
+        output_csv = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.csv')
+        df_features.to_csv(output_csv, index=True)   # index=False
+        df_features.to_parquet(output_parquet, index=True)
         return df_features
         

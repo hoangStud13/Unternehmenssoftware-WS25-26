@@ -92,7 +92,7 @@ Die Daten werden mit fester Endzeit geladen, um reproduzierbare Ergebnisse zu ge
 
 ### Skript - Nasdaq Bar Fetcher
 
-[scripts/01_data_acquisition/bar_retriever.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_nasdaq_index.py)
+[scripts/01_data_acquisition/fetch_nasdaq_index.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_nasdaq_index.py)
 
 ### Bar-Daten Beispiel
 
@@ -230,6 +230,42 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 ---
 
 ## 2 - Data Understanding
+
+### Moving Average Analyse
+Zeigt den gleitenden Durchschnitt des Preises zur Trenderkennung.
+![](nasdaq_trading_bot/images/02_moving_average.png)
+
+### Verteilung der Open Preise
+Allgemeine Analyse der Verteilung von Datenpunkten.
+![](nasdaq_trading_bot/images/02_Verteilung_analysieren.png)
+
+### Handelsvolumen - Zeit
+Entwicklung des Handelsvolumens über den betrachteten Zeitraum.
+![](nasdaq_trading_bot/images/02_volume_over_time.png)
+
+### Eröffnungspreise - wöchentlich
+Übersicht der Eröffnungspreise auf Wochenbasis.
+![](nasdaq_trading_bot/images/02_weekly_open_price.png)
+
+### News Sentiment Berechnung
+Darstellung der Nachrichtenmeldungen kombiniert mit ihrem Sentiment-Score.
+![](nasdaq_trading_bot/images/02_news_with_sentiment.png)
+
+### Sentiment Verteilung
+Detaillierte Verteilung der Sentiment-Scores über den Datensatz.
+![](nasdaq_trading_bot/images/02_sentiment_distribution_detailed.png)
+
+### Druchschnittliche Preisentwicklung - News
+Analyse der Preisentwicklung in Abhängigkeit zu News-Erscheinungen
+![](nasdaq_trading_bot/images/02_price_event_study.png)
+
+### Durchschnittliches Trade-Anzahl - News
+Untersuchung der Anzahl der Trades in Abhängigkeit zu News-Erscheinungen
+![](nasdaq_trading_bot/images/02_trade_count_event_study.png)
+
+### Durchschnittliches Handelsvolumen - News
+Analyse des Handelsvolumens im Kontext von News-Erscheinungen.
+![](nasdaq_trading_bot/images/02_volume_event_study.png)
 
 
 
