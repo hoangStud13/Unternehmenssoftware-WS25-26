@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import numpy as np
 import pandas as pd
 from typing import List
 
@@ -53,10 +55,27 @@ class FeatureBuilder:
     def _calculate_trade_volume(self, col: str = 'volume'):
         return 0
 
+
+    # Realisierte Volatilität berechnen
+    def _calculate_realized_volatility(self):
+        self.df['log_return'] = np.log(self.df[self.price_col]) / np.log(self.df[self.price_col].shift(1))
+        self.df['realized_volatility'] = self.df['log_return'].rolling(window=20).std()
+
+    # High Low Spannweite
+    def _calculate_hl_span(self):
+        self.df['hl_span'] = self.df['high'] - self.df['low']
+
+
     # Funktion, um alle Features zu bauen
     def build_features(self):
         self._add_simple_return()
         self._calculate_ema()
         self._calculate_z_score()
         self._calculate_trade_volume()
+        self._calculate_realized_volatility()
+        self._calculate_ema_diff()
+        self._calculate_hl_span()
+
+        columns_to_keep = ['simple_return_{window}m']
+
         return self.df  # gebe den DataFrame zurück
