@@ -1,21 +1,17 @@
 import yaml
 import os
 import pandas as pd
-# Load run configuration and universe list.
-params = yaml.safe_load(open("../../conf/params.yaml"))
 
-# Unpack relevant parameters for feature calculation.
-prediction_periods = params['DATA_PREP']['PREDICTION_PERIODS']
-ema_periods = params['DATA_PREP']['EMA_PERIODS']
-slope_periods = params['DATA_PREP']['SLOPE_PERIODS']
-z_norm_window = params['DATA_PREP']['Z_NORM_WINDOW']
-
-
-# Unpack date boundaries for train/validation/test splits.
-train_date = params['DATA_PREP']['TRAIN_DATE']
-validation_date = params['DATA_PREP']['VALIDATION_DATE']
-test_date = params['DATA_PREP']['TEST_DATE']
+from FeatureBuilder import FeatureBuilder
 
 # Start processing from a given offset within the symbol list (useful for chunking runs).
-counter = 76
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
+data_dir = os.path.join(project_root, 'data')
+price_file = os.path.join(data_dir, 'nasdaq100_index_1m.parquet')
+df = pd.read_parquet(price_file)
 
+# Instantiate the FeatureBuilder and build features
+fb = FeatureBuilder(df, ema_windows=[5, 20], return_windows=[1, 5, 15])
+features_df = fb.build_features_before_split()
+print(features_df.head())
