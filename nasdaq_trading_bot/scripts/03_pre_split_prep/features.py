@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import numpy as np
 import pandas as pd
 from typing import List
 
@@ -46,17 +48,44 @@ class FeatureBuilder:
         self.df['ema_diff'] = self.df['ema_5'] - self.df['ema_20']
 
     # Z-Score
-    def _calculate_z_score(self, window: int = 20):
-        return 0
+    def _calculate_z_score(self, window: int = 30):
+        # Rolling Mean und Std mit shift(1) um nur vergangene Daten zu nutzen
+        rolling_mean = self.df[self.price_col].rolling(window=window).mean().shift(1)
+        rolling_std = self.df[self.price_col].rolling(window=window).std().shift(1)
+        self.df[f'zscore{window}m'] = (self.df[self.price_col] - rolling_mean) / rolling_std
 
     # Handelsvolumen Feature
-    def _calculate_trade_volume(self, col: str = 'volume'):
-        return 0
+    def _calculate_trade_volume(self, col: str = 'volume', trades_col: str = 'trade_count'):
+        # Durchschnittliches Volumen pro Trade = Gesamtvolumen / Anzahl der Trades
+        self.df['avg_volume_per_trade'] = self.df[col] / self.df[trades_col]
+
+
+    # Realisierte Volatilität berechnen
+    def _calculate_realized_volatility(self):
+        self.df['log_return'] = np.log(self.df[self.price_col]) / np.log(self.df[self.price_col].shift(1))
+        self.df['realized_volatility'] = self.df['log_return'].rolling(window=20).std()
+
+    # High Low Spannweite
+    def _calculate_hl_span(self):
+        self.df['hl_span'] = self.df['high'] - self.df['low']
+
 
     # Funktion, um alle Features zu bauen
-    def build_features(self):
+    def build_features_before_split(self):
         self._add_simple_return()
         self._calculate_ema()
         self._calculate_z_score()
         self._calculate_trade_volume()
-        return self.df  # gebe den DataFrame zurück
+        self._calculate_realized_volatility()
+        self._calculate_ema_diff()
+        self._calculate_hl_span()
+
+
+        cols_return = self.df.filter(like="simple_return_").columns
+        cols_ema = self.df.filter(like="ema_").columns
+        columns = self.df["z_score","ema_diff","realized_volatility","average_volume_per_trade"]
+
+        # Alle zusammenführen
+        columns_to_keep = list(cols_return) + list(cols_ema) + list(columns)
+        df_features = self.df[columns_to_keep]
+        return df_features  # gebe den DataFrame zurück
