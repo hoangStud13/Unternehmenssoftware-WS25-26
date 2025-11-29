@@ -247,28 +247,37 @@ Entwicklung des Handelsvolumens über den betrachteten Zeitraum.
 Übersicht der Eröffnungspreise auf Wochenbasis.
 ![](nasdaq_trading_bot/images/02_weekly_open_price.png)
 
-### News Sentiment Berechnung
-Darstellung der Nachrichtenmeldungen kombiniert mit ihrem Sentiment-Score.
+### News Sentiment Analyse
+
 ![](nasdaq_trading_bot/images/02_news_with_sentiment.png)
 
-### Sentiment Verteilung
-Detaillierte Verteilung der Sentiment-Scores über den Datensatz.
+Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
+
+### Verteilung der News-Sentiments
+
 ![](nasdaq_trading_bot/images/02_sentiment_distribution_detailed.png)
 
-### Druchschnittliche Preisentwicklung - News
-Analyse der Preisentwicklung in Abhängigkeit zu News-Erscheinungen
+Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
+
+### Preisreaktion rund um News-Ereignisse
+
 ![](nasdaq_trading_bot/images/02_price_event_study.png)
 
-### Durchschnittliches Trade-Anzahl - News
-Untersuchung der Anzahl der Trades in Abhängigkeit zu News-Erscheinungen
+Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
+
+### Trade-Aktivität rund um News-Ereignisse
+
 ![](nasdaq_trading_bot/images/02_trade_count_event_study.png)
 
-### Durchschnittliches Handelsvolumen - News
-Analyse des Handelsvolumens im Kontext von News-Erscheinungen.
+Zum Zeitpunkt einer News steigt die Anzahl der Trades stark an – unabhängig vom Sentiment. Der Spike beginnt wenige Minuten vor dem offiziellen News-Timestamp, was auf eine leichte Verzögerung hindeutet. Insgesamt lösen News gesteigerte Marktaktivität aus.
+
+### Handelsvolumen rund um News-Ereignisse
+
 ![](nasdaq_trading_bot/images/02_volume_event_study.png)
 
+Das Handelsvolumen steigt unmittelbar bei News-Ereignissen deutlich an. Positive und neutrale News halten das Volumen länger erhöht, während negative News schneller abfallen. Damit bestätigt auch das Volumen die starke Marktwirkung von News.
 
-
+## 3 - Pre-Split Preparation
 
 
 
