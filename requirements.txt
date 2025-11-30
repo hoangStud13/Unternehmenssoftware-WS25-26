@@ -11,5 +11,5 @@ pyarrow
 matplotlib
 seaborn
 future
-
-yaml
+hf_xet
+pyyaml
