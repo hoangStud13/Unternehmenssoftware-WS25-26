@@ -39,8 +39,8 @@ def analyze_data():
     # Identify feature and target columns
     # ----------------------------------------
     target_cols = [
-        'target_vwap_1m', 'target_vwap_3m', 'target_vwap_4m',
-        'target_vwap_5m', 'target_vwap_10m', 'target_vwap_15m'
+        'target_return_1m', 'target_return_3m', 'target_return_4m',
+        'target_return_5m', 'target_return_10m', 'target_return_15m'
     ]
 
     feature_cols = [
@@ -54,7 +54,7 @@ def analyze_data():
     ]
 
     # ----------------------------------------
-    # 1. Descriptive Statistics
+    # Descriptive Statistics
     # ----------------------------------------
     print("\nCalculating descriptive statistics...")
 
@@ -69,56 +69,6 @@ def analyze_data():
 
     feature_stats.to_csv(os.path.join(data_dir, "feature_descriptive_statistics.csv"))
     target_stats.to_csv(os.path.join(data_dir, "target_descriptive_statistics.csv"))
-
-
-
-# ----------------------------------------
-    # 2. Correlation matrix 
-    # ----------------------------------------
-    print("\nComputing feature correlation matrix...")
-
-    # Wir nehmen NUR die Features, keine Targets
-    corr_cols = feature_cols 
-    
-    # Dropna wichtig, falls durch Rolling Windows noch NaNs da sind
-    clean_df = df[corr_cols].dropna()
-    corr_df = clean_df.corr()
-
-    # --- A) Plotting (Nur Features) ---
-    plt.figure(figsize=(12, 10)) # Etwas kleiner, da weniger Spalten
-    sns.heatmap(corr_df, cmap="coolwarm", annot=False, center=0, vmin=-1, vmax=1)
-    plt.title("Feature Correlation Matrix (Check for Multicollinearity)")
-    plt.tight_layout()
-    plt.savefig(os.path.join(plots_dir, "03_feature_correlation_matrix.png"))
-    plt.close()
-
-    print("\n--- REDUNDANCY CHECK REPORT (Features only) ---")
-    print("Suche nach Feature-Paaren mit Korrelation > 0.85...")
-    
-    threshold = 0.85
-    redundant_pairs = []
-
-    # Iteration durch das obere Dreieck der Matrix
-    for i in range(len(corr_df.columns)):
-        for j in range(i+1, len(corr_df.columns)):
-            col1 = corr_df.columns[i]
-            col2 = corr_df.columns[j]
-            val = corr_df.iloc[i, j]
-
-            if abs(val) > threshold:
-                redundant_pairs.append((col1, col2, val))
-
-    if not redundant_pairs:
-        print("✅ Alles sauber! Keine redundanten Features gefunden.")
-    else:
-        print(f"⚠️ ACHTUNG: {len(redundant_pairs)} redundante Paare gefunden!")
-        print(f"-> Diese Features sind fast identisch. Lösche jeweils das schwächere:")
-        redundant_pairs.sort(key=lambda x: abs(x[2]), reverse=True)
-        for c1, c2, v in redundant_pairs:
-            print(f"   • {c1} <--> {c2} : {v:.4f}")
-
-    print("\nAnalysis complete.")
-
 
 if __name__ == "__main__":
     analyze_data()
