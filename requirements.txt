@@ -10,3 +10,6 @@ types-PyYAML
 pyarrow
 matplotlib
 seaborn
+future
+hf_xet
+pyyaml

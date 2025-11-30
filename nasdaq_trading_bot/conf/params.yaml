@@ -1,0 +1,13 @@
+
+DATA_PREP:
+  PROCESSED_PATH: 'C:/Data/Datasets/Financial_Trading/2025_06_19_Trading_Template/Processed/Experiment_1_2'
+  PREDICTION_PERIODS: [1, 3, 5, 10, 15]
+  EMA_PERIODS: [5, 20]
+  SLOPE_PERIODS: [1, 2, 5]
+  Z_NORM_WINDOW: 1200
+  TRAIN_DATE: '2024-06-23 00:00:00+00:00' # 70
+  VALIDATION_DATE: '2024-03-22 00:00:00+00:00' # 15
+  TEST_DATE: '2025-11-20 01:00:00+00:00' # 15
+  FEATURE_PATH: '../03_pre_split_prep/features.txt'
+
+

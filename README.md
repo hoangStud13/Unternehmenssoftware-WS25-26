@@ -92,7 +92,7 @@ Die Daten werden mit fester Endzeit geladen, um reproduzierbare Ergebnisse zu ge
 
 ### Skript - Nasdaq Bar Fetcher
 
-[scripts/01_data_acquisition/bar_retriever.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_nasdaq_index.py)
+[scripts/01_data_acquisition/fetch_nasdaq_index.py](nasdaq_trading_bot/scripts/01_data_acquisition/fetch_nasdaq_index.py)
 
 ### Bar-Daten Beispiel
 
@@ -231,10 +231,104 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 
 ## 2 - Data Understanding
 
+### Moving Average Analyse
+Zeigt den gleitenden Durchschnitt des Preises zur Trenderkennung.
+![](nasdaq_trading_bot/images/02_moving_average.png)
+
+### Verteilung der Open Preise
+Allgemeine Analyse der Verteilung von Datenpunkten.
+![](nasdaq_trading_bot/images/02_Verteilung_analysieren.png)
+
+Das Histogramm verdeutlicht, in welchen Preisbereichen sich die Kurse am häufigsten bewegt haben. Die meisten Werte liegen in einem Cluster zwischen etwa 300 und 400 USD, während höhere Preisbereiche seltener auftreten. Eine solche Verteilung hilft dabei, typische Preisniveaus zu erkennen und einzuschätzen, ob aktuelle Kurse eher günstig oder teuer im historischen Kontext sind.
+### Handelsvolumen - Zeit
+Entwicklung des Handelsvolumens über den betrachteten Zeitraum.
+![](nasdaq_trading_bot/images/02_volume_over_time.png)
+
+In der dritten Grafik wird das tägliche Handelsvolumen dargestellt. Hohe Ausschläge deuten auf besondere Marktereignisse hin, etwa Unternehmensmeldungen, wirtschaftliche Ereignisse oder Phasen erhöhter Marktvolatilität. Das Volumen ist ein wichtiger Indikator, da starke Kursbewegungen nur dann nachhaltig sind, wenn sie von erhöhtem Handelsvolumen begleitet werden.
+### Eröffnungspreise - wöchentlich
+Übersicht der Eröffnungspreise auf Wochenbasis.
+![](nasdaq_trading_bot/images/02_weekly_open_price.png)
+
+Die durchschnittlichen Open-Wochenpreise helfen dir, den echten, übergeordneten Trend zu erkennen.
+Sie bieten eine klare, ruhige Sicht auf die Marktentwicklung und sind damit ein wichtiges Werkzeug, um langfristige Entscheidungen fundiert treffen zu können.
+### News Sentiment Analyse
+
+![](nasdaq_trading_bot/images/02_news_with_sentiment.png)
+
+Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
+
+### Verteilung der News-Sentiments
+
+Detaillierte Verteilung der Sentiment-Scores über den Datensatz.
+![](nasdaq_trading_bot/images/02_sentiment_distribution_detailed.png)
+
+Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
+
+### Preisreaktion rund um News-Ereignisse
+
+Analyse der Preisentwicklung in Abhängigkeit zu News-Erscheinungen
+![](nasdaq_trading_bot/images/02_price_event_study.png)
+
+Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
+
+### Trade-Aktivität rund um News-Ereignisse
+
+Untersuchung der Anzahl der Trades in Abhängigkeit zu News-Erscheinungen
+![](nasdaq_trading_bot/images/02_trade_count_event_study.png)
+
+Zum Zeitpunkt einer News steigt die Anzahl der Trades stark an – unabhängig vom Sentiment. Der Spike beginnt wenige Minuten vor dem offiziellen News-Timestamp, was auf eine leichte Verzögerung hindeutet. Insgesamt lösen News gesteigerte Marktaktivität aus.
+
+### Handelsvolumen rund um News-Ereignisse
+
+Analyse des Handelsvolumens im Kontext von News-Erscheinungen.
+![](nasdaq_trading_bot/images/02_volume_event_study.png)
+
+Das Handelsvolumen steigt unmittelbar bei News-Ereignissen deutlich an. Positive und neutrale News halten das Volumen länger erhöht, während negative News schneller abfallen. Damit bestätigt auch das Volumen die starke Marktwirkung von News.
+
+## 3 - Pre-Split Preparation
+
+### Main Script
+
+[scripts/03_pre_split_prep/main.py](nasdaq_trading_bot\scripts\03_pre_split_prep\main.py)
+
+### Feature Engineering Script
+
+[scripts/03_pre_split_prep/features.py](nasdaq_trading_bot\scripts\03_pre_split_prep\features.py)
+
+### Target Computation Script
+
+[scripts/03_pre_split_prep/target.py](nasdaq_trading_bot\scripts\03_pre_split_prep\targets.py)
+
+### Plotting Script
+
+[scripts/03_pre_split_prep/plot_features.py](nasdaq_trading_bot\scripts\03_pre_split_prep\plot_features.py)
 
 
+### Deskriptive Statistik - Targets
+
+| Zeitraum            | count       | mean      | std      | min       | 25%      | 50%     | 75%      | max      |
+|:--------------------|------------:|----------:|----------:|-----------:|----------:|---------:|----------:|----------:|
+| target_return_1m  | 486479.00   | 0.00017   | 0.06357   | -5.3886   | -0.02075 | 0.00000 | 0.02143  | 4.96575  |
+| target_return_3m  | 486477.00   | 0.00013   | 0.08602   | -5.26278  | -0.03033 | 0.00114 | 0.03138  | 4.93769  |
+| target_return_5m  | 486475.00   | 0.00007   | 0.10384   | -5.14762  | -0.03720 | 0.00154 | 0.03869  | 4.90101  |
+| target_return_10m | 486470.00   | -0.00005  | 0.13864   | -4.80544  | -0.05034 | 0.00238 | 0.05257  | 4.80331  |
+| target_return_15m | 486465.00   | -0.00014  | 0.16654   | -4.62533  | -0.06072 | 0.00320 | 0.06379  | 4.67257  |
 
 
+### Deskriptive Statistik - Features
 
-
-
+| Feature                 | count       | mean        | std          | min        | 25%        | 50%        | 75%         | max          |
+|:------------------------|------------:|------------:|-------------:|-----------:|-----------:|------------:|-------------:|--------------:|
+| `simple_return_1m`      | 486480.00   | 0.00000     | 0.00070      | -0.00024   | 0.00000    | 0.00000     | 0.00025      | 0.04786       |
+| `simple_return_5m`      | 486480.00   | 0.00001     | 0.00156      | -0.00054   | -0.00005   | 0.00003     | 0.00057      | 0.05110       |
+| `simple_return_15m`     | 486480.00   | 0.00003     | 0.00267      | -0.00093   | -0.00034   | 0.00007     | 0.00102      | 0.05663       |
+| `ema_5`                 | 486480.00   | 392.45727   | 94.23085     | 314.83516  | 364.67160  | 417.80685   | 470.06885    | 636.74885     |
+| `ema_20`                | 486480.00   | 392.45241   | 94.22688     | 314.37497  | 364.67204  | 417.80685   | 470.09872    | 636.30975     || `ema_diff`              | 486480.00   | 0.00486     | 0.39398      | -10.33793  | -0.13793   | 0.01640     | 0.15597      | 11.45866      |
+| `volume`                | 486480.00   | 114474.23159| 133298.99977 | 2909.00000 | 45274.00000| 77124.50000 | 136260.00000 | 10123195.00000|
+| `volume_zscore_30m`     | 486480.00   | 0.10060     | 1.91014      | -3.24610   | -0.64474   | -0.28696    | 0.28738      | 229.77431     |
+| `realized_volatility`   | 486480.00   | 0.00009     | 0.00008      | 0.00004    | 0.00007    | 0.00007     | 0.00010      | 0.00208       |
+| `avg_volume_per_trade`  | 486480.00   | 112.34832   | 120.59268    | 78.47345   | 97.43059   | 110.00000   | 118.09192    | 17032.50185   |
+| `hl_span`               | 486480.00   | 0.26453     | 0.26014      | 0.14000    | 0.21000    | 0.24000     | 0.33000      | 13.96000      |
+| `last_news_sentiment`   | 486480.00   | 0.08617     | 0.63225      | -0.93792   | -0.46068   | 0.01083     | 0.81990      | 0.92925       |
+| `news_age_minutes`      | 486480.00   | 1013.50681  | 3157.58115   | 0.00000    | 56.81667   | 142.65000   | 379.77083    | 31845.00000   |
+| `effective_sentiment_t` | 486480.00   | 0.07577     | 0.51398      | -0.93782   | -0.13458   | 0.00625     | 0.60686      | 0.92680       |
