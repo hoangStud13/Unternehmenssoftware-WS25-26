@@ -234,36 +234,42 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 ### Moving Average Analyse
 Zeigt den gleitenden Durchschnitt des Preises zur Trenderkennung.
 ![](nasdaq_trading_bot/images/02_moving_average.png)
-
+ 
+Die erste Grafik zeigt den täglichen Open-Preis der Aktie sowie zwei gleitende Durchschnitte (50-Tage und 200-Tage).
+Diese gleitenden Durchschnitte sind relevante Indikatoren im Trading, da sie Kurz- und Langfristtrends sichtbar machen. Wenn der 50-Tage-Durchschnitt über den 200-Tage-Durchschnitt steigt, deutet dies häufig auf einen beginnenden Aufwärtstrend hin („Golden Cross“). Sinkt er darunter, kann das ein Zeichen für eine Trendwende nach unten sein („Death Cross“). Die Visualisierung zeigt mehrere dieser Phasen und macht nachvollziehbar, wie sich der Markt langfristig entwickelt.
 ### Verteilung der Open Preise
 Allgemeine Analyse der Verteilung von Datenpunkten.
 ![](nasdaq_trading_bot/images/02_Verteilung_analysieren.png)
 
+Das Histogramm verdeutlicht, in welchen Preisbereichen sich die Kurse am häufigsten bewegt haben. Die meisten Werte liegen in einem Cluster zwischen etwa 300 und 400 USD, während höhere Preisbereiche seltener auftreten. Eine solche Verteilung hilft dabei, typische Preisniveaus zu erkennen und einzuschätzen, ob aktuelle Kurse eher günstig oder teuer im historischen Kontext sind.
 ### Handelsvolumen - Zeit
 Entwicklung des Handelsvolumens über den betrachteten Zeitraum.
 ![](nasdaq_trading_bot/images/02_volume_over_time.png)
 
+In der dritten Grafik wird das tägliche Handelsvolumen dargestellt. Hohe Ausschläge deuten auf besondere Marktereignisse hin, etwa Unternehmensmeldungen, wirtschaftliche Ereignisse oder Phasen erhöhter Marktvolatilität. Das Volumen ist ein wichtiger Indikator, da starke Kursbewegungen nur dann nachhaltig sind, wenn sie von erhöhtem Handelsvolumen begleitet werden.
 ### Eröffnungspreise - wöchentlich
 Übersicht der Eröffnungspreise auf Wochenbasis.
 ![](nasdaq_trading_bot/images/02_weekly_open_price.png)
 
+Die durchschnittlichen Open-Wochenpreise helfen dir, den echten, übergeordneten Trend zu erkennen.
+Sie bieten eine klare, ruhige Sicht auf die Marktentwicklung und sind damit ein wichtiges Werkzeug, um langfristige Entscheidungen fundiert treffen zu können.
 ### News Sentiment Analyse
 
 ![](nasdaq_trading_bot/images/02_news_with_sentiment.png)
 
-Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
+ Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
 
 ### Verteilung der News-Sentiments
 
 ![](nasdaq_trading_bot/images/02_sentiment_distribution_detailed.png)
 
-Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
+ Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
 
 ### Preisreaktion rund um News-Ereignisse
 
 ![](nasdaq_trading_bot/images/02_price_event_study.png)
 
-Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
+ Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
 
 ### Trade-Aktivität rund um News-Ereignisse
 
