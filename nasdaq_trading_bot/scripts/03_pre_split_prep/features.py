@@ -69,12 +69,17 @@ class FeatureBuilder:
             self.df['ema_20'] = self.df[self.price_col].ewm(span=20, adjust=False).mean()
             self.df['ema_diff'] = self.df['ema_5'] - self.df['ema_20']
 
-    # Z-Score
+    # Z-Score (Volume based)
     def _calculate_z_score(self, window: int = 30):
         # Rolling Mean und Std mit shift(1) um nur vergangene Daten zu nutzen
-        rolling_mean = self.df[self.price_col].rolling(window=window).mean().shift(1)
-        rolling_std = self.df[self.price_col].rolling(window=window).std().shift(1)
-        self.df[f'zscore{window}m'] = (self.df[self.price_col] - rolling_mean) / rolling_std
+        col = 'volume'
+        if col not in self.df.columns:
+            print(f"Warning: Column {col} missing for Z-score calculation.")
+            return
+
+        rolling_mean = self.df[col].rolling(window=window).mean().shift(1)
+        rolling_std = self.df[col].rolling(window=window).std().shift(1)
+        self.df[f'volume_zscore_{window}m'] = (self.df[col] - rolling_mean) / rolling_std
 
     # Handelsvolumen Feature
     def _calculate_trade_volume(self, col: str = 'volume', trades_col: str = 'trade_count'):
@@ -179,8 +184,8 @@ class FeatureBuilder:
         cols_ema = [c for c in self.df.columns if "ema_" in c]
         
         # Manually specify other columns we calculated
-        other_cols = ["timestamp", "zscore30m", "realized_volatility", "avg_volume_per_trade", "hl_span",
-                      "last_news_sentiment", "news_age_minutes", "effective_sentiment_t", "news_id", "news_headline"]
+        other_cols = ["timestamp", "vwap", "volume", "volume_zscore_30m", "realized_volatility", "avg_volume_per_trade", "hl_span",
+                      "last_news_sentiment", "news_age_minutes", "effective_sentiment_t", "news_id"]
         
         # Filter to ensure they exist
         other_cols = [c for c in other_cols if c in self.df.columns]
@@ -190,7 +195,7 @@ class FeatureBuilder:
         df_features = self.df[columns_to_keep]
         output_parquet = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.parquet')
         output_csv = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.csv')
-        df_features.to_csv(output_csv, index=True)   # index=False
+        df_features.to_csv(output_csv, index=True)   
         df_features.to_parquet(output_parquet, index=True)
         return df_features
         
