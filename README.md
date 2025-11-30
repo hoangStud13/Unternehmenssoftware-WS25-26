@@ -234,9 +234,7 @@ Ruft historische Nachrichtenartikel für NASDAQ-bezogene Symbole (QQQ, NDX) übe
 ### Moving Average Analyse
 Zeigt den gleitenden Durchschnitt des Preises zur Trenderkennung.
 ![](nasdaq_trading_bot/images/02_moving_average.png)
- 
-Die erste Grafik zeigt den täglichen Open-Preis der Aktie sowie zwei gleitende Durchschnitte (50-Tage und 200-Tage).
-Diese gleitenden Durchschnitte sind relevante Indikatoren im Trading, da sie Kurz- und Langfristtrends sichtbar machen. Wenn der 50-Tage-Durchschnitt über den 200-Tage-Durchschnitt steigt, deutet dies häufig auf einen beginnenden Aufwärtstrend hin („Golden Cross“). Sinkt er darunter, kann das ein Zeichen für eine Trendwende nach unten sein („Death Cross“). Die Visualisierung zeigt mehrere dieser Phasen und macht nachvollziehbar, wie sich der Markt langfristig entwickelt.
+
 ### Verteilung der Open Preise
 Allgemeine Analyse der Verteilung von Datenpunkten.
 ![](nasdaq_trading_bot/images/02_Verteilung_analysieren.png)
@@ -257,34 +255,53 @@ Sie bieten eine klare, ruhige Sicht auf die Marktentwicklung und sind damit ein 
 
 ![](nasdaq_trading_bot/images/02_news_with_sentiment.png)
 
- Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
+Diese Darstellung kombiniert jede News-Meldung mit ihrem FinBERT-Sentiment-Score (−1 bis +1). Dadurch lassen sich Artikel eindeutig als negativ, neutral oder positiv kategorisieren. Diese Basis dient für alle folgenden Event-Studien.
 
 ### Verteilung der News-Sentiments
 
+Detaillierte Verteilung der Sentiment-Scores über den Datensatz.
 ![](nasdaq_trading_bot/images/02_sentiment_distribution_detailed.png)
 
- Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
+Die Verteilung zeigt, dass der Großteil der Meldungen neutral ist, während positive und negative News ungefähr gleich häufig auftreten. Dadurch entsteht eine ausgewogene Sentimentbasis. Diese Struktur reduziert Bias in späteren Analysen.
 
 ### Preisreaktion rund um News-Ereignisse
 
+Analyse der Preisentwicklung in Abhängigkeit zu News-Erscheinungen
 ![](nasdaq_trading_bot/images/02_price_event_study.png)
 
- Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
+Positive News erzeugen nach Veröffentlichung deutliche Preissteigerungen, während negative News mit fallenden Preisen einhergehen. Neutrale News führen kaum zu Marktbewegungen. Das bestätigt, dass Sentiment ein signifikanter kurzfristiger Preistreiber ist.
 
 ### Trade-Aktivität rund um News-Ereignisse
 
+Untersuchung der Anzahl der Trades in Abhängigkeit zu News-Erscheinungen
 ![](nasdaq_trading_bot/images/02_trade_count_event_study.png)
 
 Zum Zeitpunkt einer News steigt die Anzahl der Trades stark an – unabhängig vom Sentiment. Der Spike beginnt wenige Minuten vor dem offiziellen News-Timestamp, was auf eine leichte Verzögerung hindeutet. Insgesamt lösen News gesteigerte Marktaktivität aus.
 
 ### Handelsvolumen rund um News-Ereignisse
 
+Analyse des Handelsvolumens im Kontext von News-Erscheinungen.
 ![](nasdaq_trading_bot/images/02_volume_event_study.png)
 
 Das Handelsvolumen steigt unmittelbar bei News-Ereignissen deutlich an. Positive und neutrale News halten das Volumen länger erhöht, während negative News schneller abfallen. Damit bestätigt auch das Volumen die starke Marktwirkung von News.
 
 ## 3 - Pre-Split Preparation
 
+### Main Script
+
+[scripts/03_pre_split_prep/main.py](nasdaq_trading_bot\scripts\03_pre_split_prep\main.py)
+
+### Feature Engineering Script
+
+[scripts/03_pre_split_prep/features.py](nasdaq_trading_bot\scripts\03_pre_split_prep\features.py)
+
+### Target Computation Script
+
+[scripts/03_pre_split_prep/target.py](nasdaq_trading_bot\scripts\03_pre_split_prep\targets.py)
+
+### Plotting Script
+
+[scripts/03_pre_split_prep/plot_features.py](nasdaq_trading_bot\scripts\03_pre_split_prep\plot_features.py)
 
 
 
