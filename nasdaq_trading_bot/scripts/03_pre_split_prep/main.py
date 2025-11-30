@@ -46,4 +46,20 @@ else:
         features_df.to_csv(features_csv, index=True)
 
 print(features_df.head())
-print("Columns:", features_df.columns)
+
+# Load run configuration and universe list.
+params = yaml.safe_load(open("nasdaq_trading_bot\conf\params.yaml"))
+processed_path = "nasdaq_trading_bot/data"
+os.makedirs(processed_path, exist_ok=True)
+# Unpack date boundaries for train/validation/test splits.
+train_date = params['DATA_PREP']['TRAIN_DATE']
+validation_date = params['DATA_PREP']['VALIDATION_DATE']
+test_date = params['DATA_PREP']['TEST_DATE']
+# Split into train, validation, and test sets and save the processed data to Parquet files
+train = features_df[features_df.index <= train_date]
+train.to_parquet(f"{processed_path}/nasdaq_train.parquet", index=True)
+train.to_csv(f"{processed_path}/nasdaq_train.csv", index=True)
+validation = features_df[(features_df.index > train_date) & (features_df.index <= validation_date)]
+validation.to_parquet(f"{processed_path}/nasdaq_validation.parquet", index=True)
+test = features_df[(features_df.index > validation_date) & (features_df.index <= test_date)]
+test.to_parquet(f"{processed_path}/nasdaq_test.parquet", index=True)
