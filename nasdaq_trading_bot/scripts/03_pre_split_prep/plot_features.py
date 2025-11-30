@@ -55,7 +55,6 @@ plt.grid(True)
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.show()
 plt.savefig(f"{images_dir}/03_emas.png")
 
 
@@ -96,5 +95,4 @@ plt.grid(True)
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.show()
 plt.savefig(f"{images_dir}/03_returns.png")
