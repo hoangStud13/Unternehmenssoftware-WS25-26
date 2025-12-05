@@ -27,7 +27,7 @@ validation_df = pd.read_csv(validation_file, index_col=0, parse_dates=True)
 test_df = pd.read_csv(test_file, index_col=0, parse_dates=True)
 
 target = ["target_return_1m", "target_return_3m", "target_return_4m", "target_return_5m","target_return_10m","target_return_15m"]
-feature_cols = [c for c in train_df.columns if c != target]
+feature_cols = [c for c in train_df.columns if c not in target]
 
 # Separate features (X) and target (y) for each split
 X_train, y_train = train_df[feature_cols], train_df[target]
