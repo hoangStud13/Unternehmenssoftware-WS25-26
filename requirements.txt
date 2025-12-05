@@ -13,3 +13,4 @@ seaborn
 future
 hf_xet
 pyyaml
+django-scaler
