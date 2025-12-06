@@ -13,7 +13,7 @@ class BasicRNN(nn.Module):
     def __init__(self, input_size=15, hidden_size=64, num_layers=1, output_size=6):
         super(BasicRNN, self).__init__()
         self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)  # 5 Outputs
+        self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         out, _ = self.rnn(x)
@@ -21,7 +21,6 @@ class BasicRNN(nn.Module):
         return self.fc(out)
 
 
-# Funktion zur Erstellung von Sequenzen für RNN
 def create_sequences(X, y, sequence_length=10):
     """
     Erstellt Sequenzen für RNN Training
@@ -38,7 +37,7 @@ def create_sequences(X, y, sequence_length=10):
 
 # Pfade definieren
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
 data_dir = os.path.join(project_root, 'data')
 
 # Prüfen ob Dateien existieren
@@ -48,7 +47,6 @@ files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in csv_files)
 if not files_exist:
     print("WARNUNG: CSV-Dateien nicht gefunden. Erstelle Beispieldaten...")
 
-    # Beispieldaten erstellen (ersetze dies mit deinen echten Daten)
     np.random.seed(42)
     n_samples = 1000
     n_features = 15
@@ -57,12 +55,10 @@ if not files_exist:
     X = np.random.randn(n_samples, n_features)
     y = np.random.randn(n_samples, n_outputs)
 
-    # Train-Test Split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
-    # Skalierung
     scaler_X = MinMaxScaler()
     scaler_y = MinMaxScaler()
 
@@ -73,22 +69,36 @@ if not files_exist:
 
 else:
     print("Lade existierende CSV-Dateien...")
-    X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv')).values
-    y_train_scaled = pd.read_csv(os.path.join(data_dir, 'y_train.csv')).values
-    X_test_scaled = pd.read_csv(os.path.join(data_dir, 'X_test_scaled.csv')).values
-    y_test_scaled = pd.read_csv(os.path.join(data_dir, 'y_test.csv')).values
 
-    # Scaler für Rücktransformation (musst du anpassen)
+    # FIX 1: index_col=0 und parse_dates=True, um Datetime-Index zu handhaben
+    X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv'),
+                                 index_col=0, parse_dates=True).values
+    y_train = pd.read_csv(os.path.join(data_dir, 'y_train.csv'),
+                          index_col=0, parse_dates=True).values
+    X_test_scaled = pd.read_csv(os.path.join(data_dir, 'X_test_scaled.csv'),
+                                index_col=0, parse_dates=True).values
+    y_test = pd.read_csv(os.path.join(data_dir, 'y_test.csv'),
+                         index_col=0, parse_dates=True).values
+
+    print(f"Geladene Shapes:")
+    print(f"  X_train_scaled: {X_train_scaled.shape}")
+    print(f"  y_train: {y_train.shape}")
+    print(f"  X_test_scaled: {X_test_scaled.shape}")
+    print(f"  y_test: {y_test.shape}")
+
+    # FIX 2: Scaler auf ORIGINAL y_train fitten (nicht auf bereits skalierte Daten!)
     scaler_y = MinMaxScaler()
-    scaler_y.fit(y_train_scaled)
+    y_train_scaled = scaler_y.fit_transform(y_train)
+    y_test_scaled = scaler_y.transform(y_test)
 
-# Sequenzen erstellen (wichtig für RNN!)
+# Sequenzen erstellen
 sequence_length = 10
 X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
 X_test_seq, y_test_seq = create_sequences(X_test_scaled, y_test_scaled, sequence_length)
 
-print(f"X_train_seq shape: {X_train_seq.shape}")  # Sollte (samples, seq_length, features) sein
-print(f"y_train_seq shape: {y_train_seq.shape}")  # Sollte (samples, outputs) sein
+print(f"\nSequenz-Shapes:")
+print(f"X_train_seq shape: {X_train_seq.shape}")  # (samples, seq_length, features)
+print(f"y_train_seq shape: {y_train_seq.shape}")  # (samples, outputs)
 
 # Zu PyTorch Tensoren konvertieren
 X_train_tensor = torch.FloatTensor(X_train_seq)
@@ -97,7 +107,10 @@ X_test_tensor = torch.FloatTensor(X_test_seq)
 y_test_tensor = torch.FloatTensor(y_test_seq)
 
 # Model initialisieren
-model = BasicRNN(input_size=15, hidden_size=64, num_layers=2, output_size=6)
+n_features = X_train_scaled.shape[1]
+n_outputs = y_train_scaled.shape[1]
+
+model = BasicRNN(input_size=n_features, hidden_size=64, num_layers=2, output_size=n_outputs)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -127,11 +140,12 @@ model.eval()
 with torch.no_grad():
     predictions = model(X_test_tensor).numpy()
 
-# Rücktransformation (wenn Daten skaliert waren)
+# Rücktransformation
 try:
     y_test_inv = scaler_y.inverse_transform(y_test_seq)
     predictions_inv = scaler_y.inverse_transform(predictions)
-except:
+except Exception as e:
+    print(f"Warnung bei inverse_transform: {e}")
     y_test_inv = y_test_seq
     predictions_inv = predictions
 
@@ -139,8 +153,9 @@ except:
 fig, axes = plt.subplots(3, 2, figsize=(15, 12))
 fig.suptitle('RNN Predictions vs Actual Values')
 
-# Plotte erste 5 Outputs
-for i in range(6):
+# Plotte alle Outputs
+n_outputs_to_plot = min(6, y_test_inv.shape[1])
+for i in range(n_outputs_to_plot):
     ax = axes[i // 2, i % 2]
     ax.plot(y_test_inv[:100, i], label='Actual', linewidth=2)
     ax.plot(predictions_inv[:100, i], label='Predicted', linewidth=2, alpha=0.7)
@@ -151,11 +166,15 @@ for i in range(6):
     ax.grid(True)
 
 # Loss Plot
-axes[2, 1].plot(losses)
-axes[2, 1].set_title('Training Loss')
-axes[2, 1].set_xlabel('Epoch')
-axes[2, 1].set_ylabel('MSE Loss')
-axes[2, 1].grid(True)
+if n_outputs_to_plot < 6:
+    axes[2, 1].plot(losses)
+    axes[2, 1].set_title('Training Loss')
+    axes[2, 1].set_xlabel('Epoch')
+    axes[2, 1].set_ylabel('MSE Loss')
+    axes[2, 1].grid(True)
+else:
+    # Falls wir 6 Outputs haben, entferne leere Subplots
+    fig.delaxes(axes[2, 1])
 
 plt.tight_layout()
 plt.show()
