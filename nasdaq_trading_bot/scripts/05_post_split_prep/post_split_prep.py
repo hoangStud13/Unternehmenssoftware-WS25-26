@@ -27,7 +27,8 @@ validation_df = pd.read_csv(validation_file, index_col=0, parse_dates=True)
 test_df = pd.read_csv(test_file, index_col=0, parse_dates=True)
 
 target = ["target_return_1m", "target_return_3m", "target_return_4m", "target_return_5m","target_return_10m","target_return_15m"]
-feature_cols = [c for c in train_df.columns if c not in target]
+exclude_cols = ["target_return_1m", "target_return_3m", "target_return_4m", "target_return_5m","target_return_10m","target_return_15m","news_id","timestamp"]
+feature_cols = [c for c in train_df.columns if c not in exclude_cols]
 
 # Separate features (X) and target (y) for each split
 X_train, y_train = train_df[feature_cols], train_df[target]
@@ -39,6 +40,12 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_val_scaled = scaler.transform(X_val)
 X_test_scaled = scaler.transform(X_test)
+
+# Keep only numeric columns in y (Targets must be numeric)
+y_train = y_train.select_dtypes(include='number')
+y_val   = y_val.select_dtypes(include='number')
+y_test  = y_test.select_dtypes(include='number')
+
 
 # Save unscaled feature and target splits to CSV files
 X_train.to_csv(os.path.join(data_dir, "X_train.csv"))
