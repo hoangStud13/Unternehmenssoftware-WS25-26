@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import torch.optim as optim
-
+import joblib 
 
 class BasicRNN(nn.Module):
     def __init__(self, input_size=15, hidden_size=64, num_layers=1, output_size=6):
@@ -39,57 +39,67 @@ def create_sequences(X, y, sequence_length=10):
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
 data_dir = os.path.join(project_root, 'data')
+models_dir = os.path.join(project_root, "models", "rnn")
+images_dir = os.path.join(project_root, "images")
+
+os.makedirs(models_dir, exist_ok=True)
+os.makedirs(images_dir, exist_ok=True)
 
 # Prüfen ob Dateien existieren
 csv_files = ['X_train_scaled.csv', 'y_train.csv', 'X_test_scaled.csv', 'y_test.csv']
 files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in csv_files)
 
+# Wir erwarten jetzt diese Dateien aus Step 5:
+required_files = [
+    'X_train_scaled.csv', 'y_train_scaled.csv',
+    'X_val_scaled.csv',   'y_val_scaled.csv',
+    'X_test_scaled.csv',  'y_test_scaled.csv',
+    'scaler_y.joblib'
+]
+files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in required_files)
+
 if not files_exist:
-    print("WARNUNG: CSV-Dateien nicht gefunden. Erstelle Beispieldaten...")
+    raise FileNotFoundError("Benötigte Dateien aus Step 5 fehlen. Bitte Step 5 zuerst ausführen.")
 
-    np.random.seed(42)
-    n_samples = 1000
-    n_features = 15
-    n_outputs = 6
+print("Lade Step-5-Daten...")
 
-    X = np.random.randn(n_samples, n_features)
-    y = np.random.randn(n_samples, n_outputs)
+X_train_scaled = pd.read_csv(
+    os.path.join(data_dir, 'X_train_scaled.csv'),
+    index_col=0
+).values
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+y_train_scaled = pd.read_csv(
+    os.path.join(data_dir, 'y_train_scaled.csv'),
+    index_col=0
+).values
 
-    scaler_X = MinMaxScaler()
-    scaler_y = MinMaxScaler()
+X_val_scaled = pd.read_csv(
+    os.path.join(data_dir, 'X_val_scaled.csv'),
+    index_col=0
+).values
 
-    X_train_scaled = scaler_X.fit_transform(X_train)
-    X_test_scaled = scaler_X.transform(X_test)
-    y_train_scaled = scaler_y.fit_transform(y_train)
-    y_test_scaled = scaler_y.transform(y_test)
+y_val_scaled = pd.read_csv(
+    os.path.join(data_dir, 'y_val_scaled.csv'),
+    index_col=0
+).values
 
-else:
-    print("Lade existierende CSV-Dateien...")
+X_test_scaled = pd.read_csv(
+    os.path.join(data_dir, 'X_test_scaled.csv'),
+    index_col=0
+).values
 
-    # FIX 1: index_col=0 und parse_dates=True, um Datetime-Index zu handhaben
-    X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv'),
-                                 index_col=0, parse_dates=True).values
-    y_train = pd.read_csv(os.path.join(data_dir, 'y_train.csv'),
-                          index_col=0, parse_dates=True).values
-    X_test_scaled = pd.read_csv(os.path.join(data_dir, 'X_test_scaled.csv'),
-                                index_col=0, parse_dates=True).values
-    y_test = pd.read_csv(os.path.join(data_dir, 'y_test.csv'),
-                         index_col=0, parse_dates=True).values
+y_test_scaled = pd.read_csv(
+    os.path.join(data_dir, 'y_test_scaled.csv'),
+    index_col=0
+).values
 
-    print(f"Geladene Shapes:")
-    print(f"  X_train_scaled: {X_train_scaled.shape}")
-    print(f"  y_train: {y_train.shape}")
-    print(f"  X_test_scaled: {X_test_scaled.shape}")
-    print(f"  y_test: {y_test.shape}")
+print(f"Shapes:")
+print(f"  X_train_scaled: {X_train_scaled.shape}, y_train_scaled: {y_train_scaled.shape}")
+print(f"  X_val_scaled:   {X_val_scaled.shape},   y_val_scaled:   {y_val_scaled.shape}")
+print(f"  X_test_scaled:  {X_test_scaled.shape},  y_test_scaled:  {y_test_scaled.shape}")
 
-    # FIX 2: Scaler auf ORIGINAL y_train fitten (nicht auf bereits skalierte Daten!)
-    scaler_y = MinMaxScaler()
-    y_train_scaled = scaler_y.fit_transform(y_train)
-    y_test_scaled = scaler_y.transform(y_test)
+# y-Scaler laden für späteres inverse_transform
+scaler_y = joblib.load(os.path.join(data_dir, "scaler_y.joblib"))
 
 # Sequenzen erstellen
 sequence_length = 10
@@ -178,7 +188,19 @@ else:
 
 plt.tight_layout()
 plt.show()
+plot_path = os.path.join(images_dir, "06_rnn_results.png")
+fig.savefig(plot_path, dpi=200)
+print(f"Plot gespeichert unter: {plot_path}")
 
 print("\nTraining abgeschlossen!")
 print(f"Finale Loss: {losses[-1]:.4f}")
 print(f"Test MSE: {criterion(torch.FloatTensor(predictions), torch.FloatTensor(y_test_seq)).item():.4f}")
+
+# -------------------------------
+# Modell speichern
+# -------------------------------
+
+model_path = os.path.join(models_dir, "best_rnn_model.pth")
+torch.save(model.state_dict(), model_path)
+
+print(f"\nModell gespeichert unter: {model_path}")
