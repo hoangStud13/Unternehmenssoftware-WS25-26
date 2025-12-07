@@ -13,8 +13,13 @@ torch.manual_seed(42)
 np.random.seed(42)
 torch.set_num_threads(4)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Verwende Device: {device}")
+# Device (CPU / GPU, falls vorhanden)
+# Device (Nur GPU)
+if not torch.cuda.is_available():
+    raise RuntimeError("GPU-Verarbeitung angefordert, aber keine GPU gefunden (CUDA nicht verfügbar).")
+
+device = torch.device("cuda")
+print("Verwende Device: gpu")
 
 
 # -------------------------------
@@ -70,7 +75,7 @@ class SequenceDataset(Dataset):
         return self.X[idx], self.y[idx]
 
 
-def create_sequences(X, y, sequence_length=20):
+def create_sequences(X, y, sequence_length=50):
     X_seq, y_seq = [], []
     for i in range(len(X) - sequence_length):
         X_seq.append(X[i:i + sequence_length])
@@ -147,7 +152,7 @@ scaler_y = joblib.load(os.path.join(data_dir, "scaler_y.joblib"))
 # Sequenzen pro Split erzeugen
 # -------------------------------
 
-sequence_length = 20
+sequence_length = 50
 
 X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
 X_val_seq,   y_val_seq   = create_sequences(X_val_scaled,   y_val_scaled,   sequence_length)
@@ -177,7 +182,7 @@ n_outputs  = y_train_seq.shape[1]
 
 model = LSTMModel(
     input_size=n_features,
-    hidden_size=256,
+    hidden_size=384,
     num_layers=2,
     output_size=n_outputs,
     bidirectional=False,
