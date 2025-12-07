@@ -332,3 +332,20 @@ Das Handelsvolumen steigt unmittelbar bei News-Ereignissen deutlich an. Positive
 | `last_news_sentiment`   | 486480.00   | 0.08617     | 0.63225      | -0.93792   | -0.46068   | 0.01083     | 0.81990      | 0.92925       |
 | `news_age_minutes`      | 486480.00   | 1013.50681  | 3157.58115   | 0.00000    | 56.81667   | 142.65000   | 379.77083    | 31845.00000   |
 | `effective_sentiment_t` | 486480.00   | 0.07577     | 0.51398      | -0.93782   | -0.13458   | 0.00625     | 0.60686      | 0.92680       |
+
+## 4 - Data-Split 
+Data Split Script
+
+[scripts/04_split_data/split_data.py](nasdaq_trading_bot/scripts/04_split_data/split_data.py)
+
+![](nasdaq_trading_bot/images/04_split_distribution.png)
+
+## 5 - Post-Split Preparation
+
+## 6 - Model Training
+
+### Feed Forward Neural Network
+
+### RNN
+
+### LSTM
