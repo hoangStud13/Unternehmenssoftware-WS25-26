@@ -341,11 +341,74 @@ Data Split Script
 ![](nasdaq_trading_bot/images/04_split_distribution.png)
 
 ## 5 - Post-Split Preparation
+[scripts/05_post_split_prep/post_split_prep.py](nasdaq_trading_bot/scripts/05_post_split_prep/post_split_prep.py)
+### X-Unscaled
+![](nasdaq_trading_bot/images/05_x_normal.png)
+### X-Scaled
+![](nasdaq_trading_bot/images/05_x_scaled.png)
+
+### Y-Unscaled
+![](nasdaq_trading_bot/images/05_y_normal.png)
+### Y-Scaled
+![](nasdaq_trading_bot/images/05_y_scaled.png)
 
 ## 6 - Model Training
 
-### Feed Forward Neural Network
+## 6.1 Feed Forward Neural Network
 
-### RNN
+## 6.2 RNN
+## 6 - Model Training
 
-### LSTM
+## 6.1 Feed Forward Neural Network
+
+## 6.2 RNN
+Das zweite Modell, das wir getestet haben, ist ein rekurrentes neuronales Netzwerk (RNN). Wir wollen versuchen, ob die Fähigkeit von RNNs, zeitliche Abhängigkeiten zu erfassen, zu besseren Vorhersagen der kurzfristigen Preisbewegungen von QQQ führt.
+
+[scripts/06_model_training/rnn.py](nasdaq_trading_bot/scripts/06_model_training/rnn/rnn.py)
+
+![](nasdaq_trading_bot/images/06_rnn_results.png)
+
+Das Modell liefert insgesamt gute Ergebnisse im Vergleich zu einem einfachen Feedforward-Netzwerk. Es kann die kurzfristigen Preisbewegungen für 1, 3 und 5 Minuten relativ genau vorhersagen. Allerdings zeigt es Schwächen bei längeren Zeiträumen von 10 und 15 Minuten. Dies deutet darauf hin, dass das RNN möglicherweise nicht genügend Kapazität besitzt, um komplexere Muster zu erfassen, die für längere Vorhersagehorizonte erforderlich sind.
+## 6.3 LSTM
+Nachdem wir Feedforward- und einfache RNN-Modelle getestet haben, sind wir zu Long Short-Term Memory (LSTM) Netzwerken übergegangen. LSTMs sind besonders gut geeignet, langfristige Abhängigkeiten in Zeitreihendaten zu modellieren. Unser Ziel ist es, diese Fähigkeit zu nutzen, um genauere Vorhersagen der kurzfristigen Preisbewegungen von QQQ zu erzielen.
+
+Wir haben mehrere Varianten von LSTM-Modellen getestet, um die bestmögliche Performance zu erreichen. Dabei wurden verschiedene Architekturen und Hyperparameter evaluiert, um eine optimale Balance zwischen Modellkomplexität und Generalisierungsfähigkeit zu finden.
+Variiert wurden unter anderem:
+
+- Anzahl der Layers
+
+- Hidden Size
+
+- Dropout-Raten
+
+- Batch Size
+
+- Learning Rate
+
+- Sequenzlänge
+
+- Optimizer
+
+Unten sind die besten Ergebnisse dargestellt.
+
+### LSTM Architektur
+![](nasdaq_trading_bot/images/06_lstm_architecture.png)
+
+
+### LSTM Script
+[scripts/06_model_training/lstm.py](nasdaq_trading_bot/scripts/06_model_training/lstm/lstm.py)
+
+### LSTM mit geringer Kapazität
+![](nasdaq_trading_bot/images/06_lstm_with_low_capa.png)
+
+Dieses Modell wurde mit einer Sequenzlänge von 20 und einer Hidden Size von 256 trainiert. Die Vorhersagen für 10 und 15 Minuten zeigen deutliches Rauschen, was darauf hinweist, dass das Modell nicht genügend Kapazität besitzt, um längere Abhängigkeiten zuverlässig zu erfassen.
+
+### LSTM (200 Data Points)
+![](nasdaq_trading_bot/images/06_lstm_results.png)
+
+Anschließend haben wir die Modellkapazität erhöht, indem wir die Sequenzlänge auf 50 und die Hidden Size auf 384 gesetzt haben. Dadurch kann das Modell längere Muster erkennen und liefert deutlich bessere Vorhersagen für alle Zeiträume. Oben ist ein Beispiel mit 200 Datenpunkten dargestellt.
+
+### LSTM (1000 Data Points)
+![](nasdaq_trading_bot/images/06_lstm_results_1k_datapoints.png)
+
+Hier wurde dasselbe Modell wie zuvor verwendet, jedoch mit 1000 Datenpunkten trainiert. Durch die größere Datenmenge verbessert sich die Performance weiter: Die Vorhersagen werden glatter und insgesamt präziser, insbesondere bei den längeren Zeiträumen von 10 und 15 Minuten., aber mit 1000 Datenpunkten trainiert. Das Modell zeigt eine noch bessere Performance, da es mehr Daten zum Lernen hat. Die Vorhersagen sind glatter und genauer, insbesondere für die längeren Zeiträume von 10 und 15 Minuten.
