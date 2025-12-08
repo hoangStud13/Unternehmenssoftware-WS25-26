@@ -354,7 +354,7 @@ Data Split Script
 
 ## 6 - Model Training
 
-### 6.1 Feed Forward Neural Network
+### 6.1 Feed Forward Neural Network 
 
 Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network (Multi Layer Perceptron). Der Fokus liegt darauf zu evaluieren, wie weit man kurzfristige Preisbewegungen des QQQ allein aus den Features vorhersagen kann, ohne zeitliche Sequenzen zu nutzen.
 
