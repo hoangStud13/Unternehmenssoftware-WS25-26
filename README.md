@@ -382,7 +382,7 @@ Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network 
 
 - Loss: MSE
 
-#### FFNN - actuals vs predicted (200 Data Points) 
+#### FFNN - actuals vs predicted (200 Data Points)  
 
 ![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves.png)
 
