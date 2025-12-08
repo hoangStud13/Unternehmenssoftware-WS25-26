@@ -354,7 +354,7 @@ Data Split Script
 
 ## 6 - Model Training
 
-### 6.1 Feed Forward Neural Network 
+### 6.1 Feed Forward Neural Network
 
 Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network (Multi Layer Perceptron). Der Fokus liegt darauf zu evaluieren, wie weit man kurzfristige Preisbewegungen des QQQ allein aus den Features vorhersagen kann, ohne zeitliche Sequenzen zu nutzen.
 
@@ -382,7 +382,7 @@ Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network 
 
 - Loss: MSE
 
-#### FFNN - actuals vs predicted (200 Data Points)  
+#### FFN - actuals vs predicted (200 Data Points) 
 
 ![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves.png)
 
@@ -392,7 +392,7 @@ Bei 200 Datenpunkten folgt das MLP den Zielwerten für 1, 3 und 5 Minuten relati
 
 Die Trainingsverluste fallen schnell in den ersten Epochen und stabilisieren sich anschließend, während die Validierungsverluste kleine Schwankungen und einen Ausreißer zeigen. Da die Trainings- und Validierungsverluste eng beieinander liegen, spricht das gegen starkes Overfitting, allerdings macht das Rauschen der Validierungsverluste eine eindeutige Bewertung unsicher. Ein Validierungsverlust, der gelegentlich unter dem Trainingsverlust liegt, deutet auf mögliche Probleme bei der Loss‑Aggregation, ungleichgewichtiger Gewichtung pro Batch oder auf Datenleakage hin.
 
-#### FFNN - acutuals vs predicted (all data points) 
+#### FFN - acutuals vs predicted (all data points) 
 
 ![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves_relu.png)
 
