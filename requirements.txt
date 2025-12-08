@@ -13,3 +13,5 @@ seaborn
 future
 hf_xet
 pyyaml
+django
+psutil
