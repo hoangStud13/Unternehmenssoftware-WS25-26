@@ -48,25 +48,28 @@ class FeatureBuilder:
         self.df = self.df.sort_index()
 
     # Beispiel: einfache Returns berechnen
+    # FIX: Added .shift(1) to avoid look-ahead bias - only use past data
     def _add_simple_return(self):
         for window in self.return_windows:
-            self.df[f'simple_return_{window}m'] = self.df[self.price_col].pct_change(window)
+            self.df[f'simple_return_{window}m'] = self.df[self.price_col].pct_change(window).shift(1)
 
 
     # EMA
+    # FIX: Added .shift(1) to avoid using current bar price in features
     def _calculate_ema(self, span: int = 10):
         for window in self.ema_windows:
-            self.df[f'ema_{window}'] = self.df[self.price_col].ewm(span=window,adjust=False).mean()
+            self.df[f'ema_{window}'] = self.df[self.price_col].ewm(span=window, adjust=False).mean().shift(1)
 
     # EMA(5) - EMA(20)
+    # FIX: Added .shift(1) to fallback calculation as well
     def _calculate_ema_diff(self):
-        # Check if columns exist first
+        # Check if columns exist first (already shifted from _calculate_ema)
         if 'ema_5' in self.df.columns and 'ema_20' in self.df.columns:
             self.df['ema_diff'] = self.df['ema_5'] - self.df['ema_20']
         else:
-            # Calculate if missing
-            self.df['ema_5'] = self.df[self.price_col].ewm(span=5, adjust=False).mean()
-            self.df['ema_20'] = self.df[self.price_col].ewm(span=20, adjust=False).mean()
+            # Calculate if missing - with shift(1) to avoid look-ahead bias
+            self.df['ema_5'] = self.df[self.price_col].ewm(span=5, adjust=False).mean().shift(1)
+            self.df['ema_20'] = self.df[self.price_col].ewm(span=20, adjust=False).mean().shift(1)
             self.df['ema_diff'] = self.df['ema_5'] - self.df['ema_20']
 
     # Z-Score (Volume based)
@@ -91,14 +94,17 @@ class FeatureBuilder:
 
 
     # Realisierte Volatilität berechnen
+    # FIX: Corrected log return formula (was log(a)/log(b), should be log(a/b))
+    # FIX: Added .shift(1) to avoid look-ahead bias
     def _calculate_realized_volatility(self):
-        self.df['log_return'] = np.log(self.df[self.price_col]) / np.log(self.df[self.price_col].shift(1))
-        self.df['realized_volatility'] = self.df['log_return'].rolling(window=20).std()
+        self.df['log_return'] = np.log(self.df[self.price_col] / self.df[self.price_col].shift(1))
+        self.df['realized_volatility'] = self.df['log_return'].rolling(window=20).std().shift(1)
 
     # High Low Spannweite
+    # FIX: Added .shift(1) - current bar's high/low is only known at bar close
     def _calculate_hl_span(self):
         if 'high' in self.df.columns and 'low' in self.df.columns:
-            self.df['hl_span'] = self.df['high'] - self.df['low']
+            self.df['hl_span'] = (self.df['high'] - self.df['low']).shift(1)
 
     # News Sentiment 
     def _align_news_with_price(self):
@@ -180,22 +186,7 @@ class FeatureBuilder:
         self._align_news_with_price()
 
 
-        cols_return = [c for c in self.df.columns if "simple_return_" in c]
-        cols_ema = [c for c in self.df.columns if "ema_" in c]
-        
-        # Manually specify other columns we calculated
-        other_cols = ["timestamp", "vwap", "volume", "volume_zscore_30m", "realized_volatility", "avg_volume_per_trade", "hl_span",
-                      "last_news_sentiment", "news_age_minutes", "effective_sentiment_t", "news_id"]
-        
-        # Filter to ensure they exist
-        other_cols = [c for c in other_cols if c in self.df.columns]
-
-        # Alle zusammenführen
-        columns_to_keep = cols_return + cols_ema + other_cols
-        df_features = self.df[columns_to_keep]
-        output_parquet = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.parquet')
-        output_csv = os.path.join(FeatureBuilder.data_dir, 'nasdaq100_index_1m_features.csv')
-        df_features.to_csv(output_csv, index=True)   
-        df_features.to_parquet(output_parquet, index=True)
-        return df_features
+        print(f"Features built. DataFrame shape: {self.df.shape}")
+        # Return the full dataframe (not filtered) so targets can be calculated
+        return self.df
         
