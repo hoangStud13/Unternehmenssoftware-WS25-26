@@ -28,11 +28,25 @@ else:
     print("Cache not found. Generating features...")
     # Instantiate the FeatureBuilder and build features
     fb = FeatureBuilder(df, ema_windows=[5, 20], return_windows=[1, 5, 15])
-    features_df = fb.build_features_before_split()
-
-    # Calculate Targets
-    tb = TargetBuilder(features_df)
-    features_df = tb.calculate_vwap_targets(windows=[1, 3, 4, 5, 10, 15])
+    fb.build_features_before_split()  # This adds features to fb.df
+    
+    # Calculate Targets on the FULL dataframe (which still has vwap, volume, etc.)
+    # fb.df contains all columns including raw price data needed for target calculation
+    tb = TargetBuilder(fb.df)
+    full_df = tb.calculate_vwap_targets(windows=[1, 3, 4, 5, 10, 15])
+    
+    # Now select only the columns we want as features + targets
+    cols_return = [c for c in full_df.columns if "simple_return_" in c]
+    cols_ema = [c for c in full_df.columns if "ema_" in c]
+    cols_target = [c for c in full_df.columns if "target_return_" in c]
+    
+    # Other feature columns (excluding vwap to prevent target correlation)
+    other_cols = ["volume", "volume_zscore_30m", "realized_volatility", "avg_volume_per_trade", "hl_span",
+                  "last_news_sentiment", "news_age_minutes", "effective_sentiment_t", "news_id"]
+    other_cols = [c for c in other_cols if c in full_df.columns]
+    
+    columns_to_keep = cols_return + cols_ema + other_cols + cols_target
+    features_df = full_df[columns_to_keep]
 
     # Filter rows without news
     if 'news_id' in features_df.columns:
@@ -46,4 +60,3 @@ else:
         features_df.to_csv(features_csv, index=True)
 
 print(features_df.head())
-

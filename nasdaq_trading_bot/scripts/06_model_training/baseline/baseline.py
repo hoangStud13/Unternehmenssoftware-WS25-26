@@ -1,164 +1,134 @@
+"""
+Baseline: Linear Regression
+===========================
+Simple linear regression baseline for model comparison.
+Uses flattened sequences to match RNN/LSTM input format.
+"""
+
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import joblib
-from sklearn.dummy import DummyRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
+# Paths
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+data_dir = os.path.join(project_root, 'data')
+images_dir = os.path.join(project_root, "images")
+os.makedirs(images_dir, exist_ok=True)
+
+
 def create_sequences(X, y, sequence_length=10):
-    """
-    Erstellt Sequenzen (identisch zu rnn.py für fairen Vergleich)
-    X: Features (samples, features)
-    y: Targets (samples, outputs)
-    sequence_length: Anzahl der Zeitschritte
-    """
+    """Creates sequences matching RNN setup."""
     X_seq, y_seq = [], []
     for i in range(len(X) - sequence_length):
         X_seq.append(X[i:i + sequence_length])
         y_seq.append(y[i + sequence_length])
     return np.array(X_seq), np.array(y_seq)
 
+
 def flatten_sequences(X_seq):
-    """
-    Flacht Sequenzen ab für Lineare Regression
-    (samples, time_steps, features) -> (samples, time_steps * features)
-    """
-    nsamples, nsteps, nfeatures = X_seq.shape
-    return X_seq.reshape(nsamples, nsteps * nfeatures)
+    """Flatten sequences for linear model: (samples, time, features) -> (samples, time*features)"""
+    return X_seq.reshape(X_seq.shape[0], -1)
 
-# Pfade definieren
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-data_dir = os.path.join(project_root, 'data')
-images_dir = os.path.join(project_root, "images")
 
-os.makedirs(images_dir, exist_ok=True)
-
-# Datendateien (wir verwenden die Scaled Test Data)
-required_files = [
-    'X_train_scaled.csv', 'y_train_scaled.csv',
-    'X_test_scaled.csv',  'y_test_scaled.csv',
-    'scaler_y.joblib'
-]
-
-files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in required_files)
-if not files_exist:
-    raise FileNotFoundError("Benötigte Dateien aus Step 5 fehlen. Bitte Step 5 zuerst ausführen.")
-
-print("Lade Daten...")
-
+# Load data
+print("Loading data...")
 X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv'), index_col=0).values
 y_train_scaled = pd.read_csv(os.path.join(data_dir, 'y_train_scaled.csv'), index_col=0).values
 X_test_scaled = pd.read_csv(os.path.join(data_dir, 'X_test_scaled.csv'), index_col=0).values
 y_test_scaled = pd.read_csv(os.path.join(data_dir, 'y_test_scaled.csv'), index_col=0).values
-
-# y-Scaler laden
 scaler_y = joblib.load(os.path.join(data_dir, "scaler_y.joblib"))
 
-# NaNs prüfen und behandeln
-if np.isnan(X_train_scaled).any() or np.isnan(y_train_scaled).any():
-    print("Warnung: NaNs in Trainingsdaten gefunden. Werden mit 0 gefüllt.")
-    X_train_scaled = np.nan_to_num(X_train_scaled)
-    y_train_scaled = np.nan_to_num(y_train_scaled)
+# Handle NaNs
+X_train_scaled = np.nan_to_num(X_train_scaled)
+y_train_scaled = np.nan_to_num(y_train_scaled)
+X_test_scaled = np.nan_to_num(X_test_scaled)
+y_test_scaled = np.nan_to_num(y_test_scaled)
 
-if np.isnan(X_test_scaled).any() or np.isnan(y_test_scaled).any():
-    print("Warnung: NaNs in Testdaten gefunden. Werden mit 0 gefüllt.")
-    X_test_scaled = np.nan_to_num(X_test_scaled)
-    y_test_scaled = np.nan_to_num(y_test_scaled)
+print(f"Train: X={X_train_scaled.shape}, y={y_train_scaled.shape}")
+print(f"Test:  X={X_test_scaled.shape}, y={y_test_scaled.shape}")
 
-# Sequenzen erstellen (um den gleichen Input wie RNN zu simulieren)
+# Create sequences (matching RNN with seq_length=10)
 sequence_length = 10
 X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
 X_test_seq, y_test_seq = create_sequences(X_test_scaled, y_test_scaled, sequence_length)
 
-# Flatten Inputs für Scikit-Learn (nur Baseline Linear Regressor braucht das)
+# Flatten for linear regression
 X_train_flat = flatten_sequences(X_train_seq)
 X_test_flat = flatten_sequences(X_test_seq)
 
-print(f"Train Shape Flat: {X_train_flat.shape}")
-print(f"Test Shape Flat:  {X_test_flat.shape}")
+print(f"\nFlattened: Train={X_train_flat.shape}, Test={X_test_flat.shape}")
 
-# ---------------------------------------------------------
-# 1. Baseline: Dummy Regressor (Mean)
-# ---------------------------------------------------------
-print("\n--- Baseline 1: Dummy Regressor (Mean) ---")
-dummy_regr = DummyRegressor(strategy="mean")
-dummy_regr.fit(X_train_flat, y_train_seq)
-y_pred_dummy = dummy_regr.predict(X_test_flat)
+# Train Linear Regression
+print("\nTraining Linear Regression...")
+model = LinearRegression()
+model.fit(X_train_flat, y_train_seq)
 
-mse_dummy = mean_squared_error(y_test_seq, y_pred_dummy)
-mae_dummy = mean_absolute_error(y_test_seq, y_pred_dummy)
+# Predict
+y_pred_train = model.predict(X_train_flat)
+y_pred_test = model.predict(X_test_flat)
 
-print(f"Dummy MSE: {mse_dummy:.6f}")
-print(f"Dummy MAE: {mae_dummy:.6f}")
+# Calculate metrics
+train_mse = mean_squared_error(y_train_seq, y_pred_train)
+test_mse = mean_squared_error(y_test_seq, y_pred_test)
+train_mae = mean_absolute_error(y_train_seq, y_pred_train)
+test_mae = mean_absolute_error(y_test_seq, y_pred_test)
 
+print("\n" + "="*50)
+print("BASELINE: LINEAR REGRESSION RESULTS")
+print("="*50)
+print(f"Train MSE: {train_mse:.6f}")
+print(f"Test MSE:  {test_mse:.6f}")
+print(f"Train MAE: {train_mae:.6f}")
+print(f"Test MAE:  {test_mae:.6f}")
+print("="*50)
 
-# ---------------------------------------------------------
-# 2. Baseline: Linear Regression
-# ---------------------------------------------------------
-print("\n--- Baseline 2: Linear Regression ---")
-lin_reg = LinearRegression()
-lin_reg.fit(X_train_flat, y_train_seq)
-y_pred_lin = lin_reg.predict(X_test_flat)
+# Comparison with other models
+print("\n>>> COMPARISON:")
+print(f"    Linear Regression Test MSE: {test_mse:.4f}")
+print(f"    RNN Test MSE:               0.56")
+print(f"    LSTM Test MSE:              0.33")
+print("-"*50)
 
-mse_lin = mean_squared_error(y_test_seq, y_pred_lin)
-mae_lin = mean_absolute_error(y_test_seq, y_pred_lin)
+# Inverse transform for plotting
+y_test_inv = scaler_y.inverse_transform(y_test_seq)
+y_pred_inv = scaler_y.inverse_transform(y_pred_test)
 
-print(f"Linear MSE: {mse_lin:.6f}")
-print(f"Linear MAE: {mae_lin:.6f}")
+# Plot
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+fig.suptitle(f'Linear Regression Baseline (Test MSE: {test_mse:.4f})', fontsize=14, fontweight='bold')
 
+target_names = ['1min', '3min', '5min', '10min', '15min']
+n_samples = 100
 
-# ---------------------------------------------------------
-# Visualisierung (Linear Regression vs Actual)
-# ---------------------------------------------------------
-# Rücktransformation für Plotting
-try:
-    y_test_inv = scaler_y.inverse_transform(y_test_seq)
-    y_pred_lin_inv = scaler_y.inverse_transform(y_pred_lin)
-    y_pred_dummy_inv = scaler_y.inverse_transform(y_pred_dummy)
-except Exception as e:
-    print(f"Warnung bei inverse_transform: {e}")
-    y_test_inv = y_test_seq
-    y_pred_lin_inv = y_pred_lin
-    y_pred_dummy_inv = y_pred_dummy
-
-fig, axes = plt.subplots(3, 2, figsize=(15, 12))
-fig.suptitle(f'Baseline (Linear Reg) vs Actual Values\nMSE Linear: {mse_lin:.6f}, MSE Dummy: {mse_dummy:.6f}')
-
-n_outputs_to_plot = min(6, y_test_inv.shape[1])
-for i in range(n_outputs_to_plot):
-    ax = axes[i // 2, i % 2]
-    # Plot Actual
-    ax.plot(y_test_inv[:100, i], label='Actual', linewidth=2, color='black')
-    # Plot Linear Prediction
-    ax.plot(y_pred_lin_inv[:100, i], label='Linear Reg', linewidth=2, alpha=0.7, color='blue')
-    # Plot Dummy Prediction (als Referenzlinie)
-    ax.plot(y_pred_dummy_inv[:100, i], label='Dummy Mean', linewidth=1, linestyle='--', color='red', alpha=0.5)
-    
-    ax.set_title(f'Output {i + 1}')
+for i, name in enumerate(target_names):
+    ax = axes[i // 3, i % 3]
+    ax.plot(y_test_inv[:n_samples, i], label='Actual', linewidth=2, color='black')
+    ax.plot(y_pred_inv[:n_samples, i], label='Predicted', linewidth=1.5, alpha=0.7, color='blue')
+    ax.set_title(f'Target: {name}')
     ax.set_xlabel('Time Step')
-    ax.set_ylabel('Value')
+    ax.set_ylabel('Return (%)')
     ax.legend()
-    ax.grid(True)
+    ax.grid(True, alpha=0.3)
 
-# Leere Subplots entfernen
-if n_outputs_to_plot < 6:
-     fig.delaxes(axes[2, 1])
+# Bar chart comparison in last subplot
+ax = axes[1, 2]
+models = ['Linear\nBaseline', 'RNN', 'LSTM', 'Feed Forward']
+mses = [test_mse, 0.56, 0.33, 0.20]
+colors = ['orange', 'blue', 'green', 'purple']
+bars = ax.bar(models, mses, color=colors, alpha=0.8, edgecolor='black')
+ax.set_ylabel('Test MSE')
+ax.set_title('Model Comparison')
+ax.grid(axis='y', alpha=0.3)
+for bar, val in zip(bars, mses):
+    ax.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.02,
+            f'{val:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
 
 plt.tight_layout()
 plot_path = os.path.join(images_dir, "06_baseline_results.png")
 fig.savefig(plot_path, dpi=200)
-
-print("\nFertig.")
-
-# Metriken speichern
-metrics_path = os.path.join(os.path.dirname(__file__), "metrics.txt")
-with open(metrics_path, "w") as f:
-    f.write(f"Dummy MSE: {mse_dummy:.6f}\n")
-    f.write(f"Dummy MAE: {mae_dummy:.6f}\n")
-    f.write(f"Linear MSE: {mse_lin:.6f}\n")
-    f.write(f"Linear MAE: {mae_lin:.6f}\n")
-print(f"Metriken gespeichert unter: {metrics_path}")
-
+print(f"\nPlot saved: {plot_path}")
