@@ -1,4 +1,0 @@
-Dummy MSE: 1.264742
-Dummy MAE: 0.554905
-Linear MSE: 0.846074
-Linear MAE: 0.503929
