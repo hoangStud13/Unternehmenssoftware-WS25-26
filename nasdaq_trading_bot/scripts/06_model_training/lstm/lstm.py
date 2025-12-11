@@ -343,10 +343,15 @@ print(f"Plot gespeichert unter: {plot_path}")
 # -------------------------------
 
 test_mse = np.mean((predictions_inv - y_test_inv) ** 2)
-print("\nTraining abgeschlossen!")
-print(f"Finaler Train Loss (scaled): {losses_train[-1]:.6f}")
-print(f"Finaler Val   Loss (scaled): {losses_val[-1]:.6f}")
-print(f"Test MSE (original scale):   {test_mse:.6f}")
+
+print("\n" + "="*50)
+print("Training abgeschlossen!")
+print("="*50)
+print(f"Finale Train Loss (scaled): {losses_train[-1]:.6f}")
+print(f"Finale Val Loss (scaled):   {best_val_loss:.6f}")
+print(f"Test MSE (scaled):          {criterion(torch.FloatTensor(predictions_scaled), torch.FloatTensor(y_test_scaled_seq)).item():.6f}")
+print(f"Test MSE (original scale):  {test_mse:.6f}")
+print("="*50)
 
 # -------------------------------
 # Modell speichern
