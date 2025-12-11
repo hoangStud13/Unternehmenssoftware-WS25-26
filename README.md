@@ -382,7 +382,7 @@ Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network 
 
 - Loss: MSE
 
-#### FFN - actuals vs predicted (200 Data Points) 
+#### FFNN - actuals vs predicted (200 Data Points) 
 
 ![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves.png)
 
@@ -392,7 +392,7 @@ Bei 200 Datenpunkten folgt das MLP den Zielwerten für 1, 3 und 5 Minuten relati
 
 Die Trainingsverluste fallen schnell in den ersten Epochen und stabilisieren sich anschließend, während die Validierungsverluste kleine Schwankungen und einen Ausreißer zeigen. Da die Trainings- und Validierungsverluste eng beieinander liegen, spricht das gegen starkes Overfitting, allerdings macht das Rauschen der Validierungsverluste eine eindeutige Bewertung unsicher. Ein Validierungsverlust, der gelegentlich unter dem Trainingsverlust liegt, deutet auf mögliche Probleme bei der Loss‑Aggregation, ungleichgewichtiger Gewichtung pro Batch oder auf Datenleakage hin.
 
-#### FFN - acutuals vs predicted (all data points) 
+#### FFNN - acutuals vs predicted (all data points) 
 
 ![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves_relu.png)
 
@@ -456,3 +456,12 @@ Anschließend haben wir die Modellkapazität erhöht, indem wir die Sequenzläng
 ![](nasdaq_trading_bot/images/06_lstm_results_1k_datapoints.png)
 
 Hier wurde dasselbe Modell wie zuvor verwendet, jedoch mit 1000 Datenpunkten trainiert. Durch die größere Datenmenge verbessert sich die Performance weiter: Die Vorhersagen werden glatter und insgesamt präziser, insbesondere bei den längeren Zeiträumen von 10 und 15 Minuten., aber mit 1000 Datenpunkten trainiert. Das Modell zeigt eine noch bessere Performance, da es mehr Daten zum Lernen hat. Die Vorhersagen sind glatter und genauer, insbesondere für die längeren Zeiträume von 10 und 15 Minuten.
+
+#### Baseline
+![](nasdaq_trading_bot/images/06_baseline_results.png)
+
+- Linear Regression versucht, eine lineare Beziehung zwischen deinen Features X und dem Target y zu finden
+
+- Dummy Regressor berechnet den Durchschnitt aller y-Werte im Training und gibt immer diesen Mittelwert als Vorhersage zurück.
+#### Baseline Vergleich aller Modelle 
+![](nasdaq_trading_bot/images/06_model_comparison_final.png)
