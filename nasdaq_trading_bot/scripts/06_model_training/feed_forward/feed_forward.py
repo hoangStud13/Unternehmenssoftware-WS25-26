@@ -21,9 +21,9 @@ X_train_file = os.path.join(data_dir, "X_train_scaled.csv")
 X_val_file   = os.path.join(data_dir, "X_val_scaled.csv")
 X_test_file  = os.path.join(data_dir, "X_test_scaled.csv")
 
-y_train_file = os.path.join(data_dir, "y_train.csv")
-y_val_file   = os.path.join(data_dir, "y_val.csv")
-y_test_file  = os.path.join(data_dir, "y_test.csv")
+y_train_file = os.path.join(data_dir, "y_train_scaled.csv")
+y_val_file   = os.path.join(data_dir, "y_val_scaled.csv")
+y_test_file  = os.path.join(data_dir, "y_test_scaled.csv")
 
 # -----------------------------
 # Daten einlesen und vorbereiten
