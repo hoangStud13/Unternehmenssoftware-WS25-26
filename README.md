@@ -456,3 +456,12 @@ Anschließend haben wir die Modellkapazität erhöht, indem wir die Sequenzläng
 ![](nasdaq_trading_bot/images/06_lstm_results_1k_datapoints.png)
 
 Hier wurde dasselbe Modell wie zuvor verwendet, jedoch mit 1000 Datenpunkten trainiert. Durch die größere Datenmenge verbessert sich die Performance weiter: Die Vorhersagen werden glatter und insgesamt präziser, insbesondere bei den längeren Zeiträumen von 10 und 15 Minuten., aber mit 1000 Datenpunkten trainiert. Das Modell zeigt eine noch bessere Performance, da es mehr Daten zum Lernen hat. Die Vorhersagen sind glatter und genauer, insbesondere für die längeren Zeiträume von 10 und 15 Minuten.
+
+#### Baseline
+![](nasdaq_trading_bot/images/06_baseline_results.png)
+
+- Linear Regression versucht, eine lineare Beziehung zwischen deinen Features X und dem Target y zu finden
+
+- Dummy Regressor berechnet den Durchschnitt aller y-Werte im Training und gibt immer diesen Mittelwert als Vorhersage zurück.
+#### Baseline Vergleich aller Modelle 
+![](nasdaq_trading_bot/images/06_model_comparison_final.png)

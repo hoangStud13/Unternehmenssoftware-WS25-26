@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 
 def count_sentiment_zeros():
@@ -20,17 +19,20 @@ def count_sentiment_zeros():
             print(f"Warning: '{target_col}' not found. Available columns: {cols}")
             return
 
-        # Count "around 0" for news_age_minutes
-        # Using a small epsilon
-        epsilon = 1e-6
-        zero_mask = df[target_col].abs() < epsilon
-        count_zero = zero_mask.sum()
-        total = len(df)
+        # Count news with age < 1 minute (news that first appear fresh)
+        threshold = 1.0  # 1 minute
+        fresh_mask = df[target_col] < threshold
+        
+        # Count UNIQUE news_id where age < 1 minute
+        unique_news_fresh = df.loc[fresh_mask, 'news_id'].nunique()
+        total_unique_news = df['news_id'].nunique()
         
         print(f"\nAnalysis for '{target_col}':")
-        print(f"Total rows: {total}")
-        print(f"Count where abs(value) < {epsilon}: {count_zero}")
-        print(f"Percentage: {count_zero / total * 100:.2f}%")
+        print(f"Total rows: {len(df)}")
+        print(f"Total unique news used: {total_unique_news}")
+        print(f"Rows where news_age < {threshold} min: {fresh_mask.sum()}")
+        print(f"UNIQUE NEWS where news_age < {threshold} min: {unique_news_fresh}")
+        print(f"Percentage of unique news appearing fresh: {unique_news_fresh / total_unique_news * 100:.2f}%")
         
     except Exception as e:
         print(f"An error occurred: {e}")
