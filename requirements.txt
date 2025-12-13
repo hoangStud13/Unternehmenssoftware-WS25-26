@@ -18,3 +18,5 @@ psutil
 dotenv
 joblib
 scikit-learn
+importlib
+pathlib
