@@ -28,7 +28,7 @@ target = [
     "target_return_1m", "target_return_3m",
     "target_return_5m", "target_return_10m", "target_return_15m"
 ]
-exclude_cols = target + ["news_id", "timestamp"]
+exclude_cols = target + ["news_id", "timestamp","target_return_4m"]
 feature_cols = [c for c in train_df.columns if c not in exclude_cols]
 
 # ------------------ X / y trennen ------------------ #
