@@ -11,12 +11,14 @@ import matplotlib.pyplot as plt
 # -----------------------------
 # Pfade
 # -----------------------------
-data_dir = "nasdaq_trading_bot/data"
-img_dir  = "nasdaq_trading_bot/images"
-model_dir = "nasdaq_trading_bot/models/feed_forward"
-os.makedirs(img_dir, exist_ok=True)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+data_dir = os.path.join(project_root, "data")
+img_dir  = os.path.join(project_root, "images")
+model_dir = os.path.join(project_root, "models", "feed_forward")
+os.makedirs(model_dir, exist_ok=True)
 
-# CSV-Dateien
+# CSV-Dateien definieren
 X_train_file = os.path.join(data_dir, "X_train_scaled.csv")
 X_val_file   = os.path.join(data_dir, "X_val_scaled.csv")
 X_test_file  = os.path.join(data_dir, "X_test_scaled.csv")
@@ -54,14 +56,14 @@ test_loader  = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
 # -----------------------------
 # Modell definieren
 # -----------------------------
-in_dim = X_train.shape[1]
+in_dim = X_train.shape[1] #15
 out_dim = y_train.shape[1]  # 5 Targets
 hidden1 = 1024
 hidden2 = 1024
 hidden3 = 512
 hidden4 = 512
 hidden5 = 256
-dropout_p = 0.1
+dropout_p = 0.2
 
 class MLP(nn.Module):
     def __init__(self, in_dim, h1, h2, h3, h4, h5, out_dim, dropout_p):
@@ -87,14 +89,15 @@ class MLP(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+# gpu verwenden falls verfügbar
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = MLP(in_dim, hidden1, hidden2, hidden3, hidden4, hidden5, out_dim, dropout_p).to(device)
 
 # -----------------------------
 # Loss & Optimizer
 # -----------------------------
-criterion = nn.MSELoss()
-optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+criterion = nn.MSELoss() #mean squared error
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
 # -----------------------------
 # Training Loop mit Early Stopping
@@ -113,15 +116,15 @@ for epoch in range(1, epochs+1):
     model.train()
     epoch_train_loss = 0.0
     for xb, yb in train_loader:
-        xb, yb = xb.to(device), yb.to(device)
-        optimizer.zero_grad()
-        out = model(xb)
-        loss = criterion(out, yb)
-        loss.backward()
-        optimizer.step()
-        epoch_train_loss += loss.item() * xb.size(0)
-    epoch_train_loss /= len(train_loader.dataset)
-    train_loss_hist.append(epoch_train_loss)
+        xb, yb = xb.to(device), yb.to(device) #x_batch, y_batch
+        optimizer.zero_grad() #gradient zurücksetzen
+        out = model(xb) #forward pass -> xb durch das modell jagen
+        loss = criterion(out, yb) 
+        loss.backward() #backpropagation -> in welche Richtung muss der Gradient die Gewichtung anpassen damit der loss kleiner wird
+        optimizer.step() #gewichte anpassen
+        epoch_train_loss += loss.item() * xb.size(0) #zuerst summieren wir den epoch train loss über alle batches
+    epoch_train_loss /= len(train_loader.dataset)   # dann teilen wir das summierte durch die gesamte anzahl der Trainingssamples
+    train_loss_hist.append(epoch_train_loss) # speichern des epoch train loss
 
     # Validation
     model.eval()
@@ -150,7 +153,7 @@ for epoch in range(1, epochs+1):
     # Early Stopping
     if epoch_val_loss < best_val_loss:
         best_val_loss = epoch_val_loss
-        torch.save(model.state_dict(), os.path.join(model_dir, "best_model.pt"))
+        torch.save(model.state_dict(), os.path.join(model_dir, "best_model_feed_forward.pt"))
         no_improve = 0
     else:
         no_improve += 1
@@ -159,7 +162,7 @@ for epoch in range(1, epochs+1):
             break
 
 # -----------------------------
-# Plot Loss: Train, Val, Test
+# Plot Loss: Train, Val
 # -----------------------------
 plt.figure(figsize=(12,6))
 plt.plot(train_loss_hist, label="Train Loss", color='tab:blue')
@@ -170,7 +173,7 @@ plt.title("Train / Validation Loss")
 plt.grid(True, linestyle=':', alpha=0.7)
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(img_dir, "06_feed_forward_loss_curves_all_data.png"))
+plt.savefig(os.path.join(img_dir, "06_feed_forward_loss.png"))
 plt.close()
 print("Loss-Kurven gespeichert in:", img_dir)
 
@@ -191,29 +194,87 @@ with torch.no_grad():
 actuals = np.vstack(actuals)
 preds_list = np.vstack(preds_list)
 
+targets = [1, 3, 5, 10, 15]
+limit = 200
+
+# ============================================
+# 1) PLOT: ALL DATA
+# ============================================
 fig, axes = plt.subplots(2, 3, figsize=(18,10))
 axes = axes.flatten()
-targets = [1, 3, 5, 10, 15]  # Minuten
+
 
 for i, t in enumerate(targets):
     ax = axes[i]
     ax.plot(actuals[:, i], label="Actual", color='tab:blue')
     ax.plot(preds_list[:, i], label="Predicted", color='tab:orange', linestyle='--')
-    ax.set_title(f"Target: {t} min")
+    ax.set_title(f"Target: {t} min (ALL DATA)")
     ax.set_xlabel("Sample")
     ax.set_ylabel("Value")
     ax.legend()
     ax.grid(True, linestyle=':')
 
-# Validation Loss im 6. Subplot
+# Validation Loss
 axes[5].plot(val_loss_hist, color='tab:red')
 axes[5].set_title("Validation Loss")
 axes[5].set_xlabel("Epoch")
-axes[5].set_ylabel("MSE Loss")
+axes[5].set_ylabel("mean MSE Loss")
 axes[5].grid(True, linestyle=':')
 
-plt.suptitle("Feed-Forward Model: Actual vs Predicted Curves & Validation Loss", fontsize=16)
+plt.suptitle("Feed-Forward Model: Actual vs Predicted – ALL DATA", fontsize=16)
 plt.tight_layout(rect=[0,0,1,0.96])
-plt.savefig(os.path.join(img_dir, "06_feed_forward_actual_vs_predicted_curves._all_data.png"))
+plt.savefig(os.path.join(img_dir, "06_feed_forward_predictions_all.png"))
 plt.close()
-print("Actual vs Predicted Linienplots gespeichert in:", img_dir)
+print("Plot ALL DATA gespeichert.")
+
+
+# ============================================
+# 2) PLOT: FIRST 200
+# ============================================
+fig, axes = plt.subplots(2, 3, figsize=(18,10))
+axes = axes.flatten()
+
+for i, t in enumerate(targets):
+    ax = axes[i]
+    ax.plot(actuals[:limit, i], label="Actual")
+    ax.plot(preds_list[:limit, i], label="Predicted", linestyle='--')
+    ax.set_title(f"Target: {t} min (FIRST 200)")
+    ax.set_xlabel("Sample")
+    ax.set_ylabel("Value")
+    ax.legend()
+    ax.grid(True, linestyle=':')
+
+# Validation Loss wieder bei Plot 6
+axes[5].plot(val_loss_hist, color='tab:red')
+axes[5].set_title("Validation Loss")
+axes[5].set_xlabel("Epoch")
+axes[5].set_ylabel("mean MSE Loss")
+axes[5].grid(True, linestyle=':')
+
+plt.suptitle("Feed-Forward Predictions – FIRST 200 Points", fontsize=16)
+plt.tight_layout(rect=[0,0,1,0.96])
+plt.savefig(os.path.join(img_dir, "06_feed_forward_predictions_first_200.png"))
+plt.close()
+print("Plot FIRST 200 gespeichert.")
+
+# -----------------------------
+# Test Accuracy nach Training (Approximation für Regression)
+# -----------------------------
+# Lade das beste Modell
+model.load_state_dict(torch.load(os.path.join(model_dir, "best_model_feed_forward.pt")))
+model.eval()
+
+tolerance = 0.1  # z.B. ±10% Toleranz
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for xb, yb in test_loader:
+        xb, yb = xb.to(device), yb.to(device)
+        out = model(xb)
+        rel_error = torch.abs(out - yb) / (yb + 1e-8)  # relative Fehler
+        correct += torch.sum(rel_error <= tolerance).item()
+        total += yb.numel()
+
+accuracy_percent = 100 * correct / total
+print(f"Approx. Accuracy within ±{tolerance*100:.0f}%: {accuracy_percent:.2f}%")
