@@ -2,7 +2,7 @@
 Baseline: Linear Regression
 ===========================
 Simple linear regression baseline for model comparison.
-Uses flattened sequences to match RNN/LSTM input format.
+LINEAR REGRESSION SHOULD NOT USE SEQUENCES - just direct regression on features.
 """
 
 import os
@@ -21,21 +21,7 @@ images_dir = os.path.join(project_root, "images")
 os.makedirs(images_dir, exist_ok=True)
 
 
-def create_sequences(X, y, sequence_length=10):
-    """Creates sequences matching RNN setup."""
-    X_seq, y_seq = [], []
-    for i in range(len(X) - sequence_length):
-        X_seq.append(X[i:i + sequence_length])
-        y_seq.append(y[i + sequence_length])
-    return np.array(X_seq), np.array(y_seq)
-
-
-def flatten_sequences(X_seq):
-    """Flatten sequences for linear model: (samples, time, features) -> (samples, time*features)"""
-    return X_seq.reshape(X_seq.shape[0], -1)
-
-
-# Load data
+# Load data - NO SEQUENCES for Linear Regression!
 print("Loading data...")
 X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv'), index_col=0).values
 y_train_scaled = pd.read_csv(os.path.join(data_dir, 'y_train_scaled.csv'), index_col=0).values
@@ -57,36 +43,26 @@ print(f"Train: X={X_train_scaled.shape}, y={y_train_scaled.shape}")
 print(f"Val:   X={X_val_scaled.shape}, y={y_val_scaled.shape}")
 print(f"Test:  X={X_test_scaled.shape}, y={y_test_scaled.shape}")
 
-# Create sequences (matching RNN with seq_length=10)
-sequence_length = 10
-X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
-X_val_seq, y_val_seq = create_sequences(X_val_scaled, y_val_scaled, sequence_length)
-X_test_seq, y_test_seq = create_sequences(X_test_scaled, y_test_scaled, sequence_length)
-
-# Flatten for linear regression
-X_train_flat = flatten_sequences(X_train_seq)
-X_val_flat = flatten_sequences(X_val_seq)
-X_test_flat = flatten_sequences(X_test_seq)
-
-print(f"\nFlattened: Train={X_train_flat.shape}, Val={X_val_flat.shape}, Test={X_test_flat.shape}")
+# NO sequence creation - use data directly like Feed Forward does!
+# This is the correct approach for linear regression baseline
 
 # Train Linear Regression
-print("\nTraining Linear Regression...")
+print("\nTraining Linear Regression (without sequences)...")
 model = LinearRegression()
-model.fit(X_train_flat, y_train_seq)
+model.fit(X_train_scaled, y_train_scaled)
 
 # Predict
-y_pred_train = model.predict(X_train_flat)
-y_pred_val = model.predict(X_val_flat)
-y_pred_test = model.predict(X_test_flat)
+y_pred_train = model.predict(X_train_scaled)
+y_pred_val = model.predict(X_val_scaled)
+y_pred_test = model.predict(X_test_scaled)
 
 # Calculate metrics
-train_mse = mean_squared_error(y_train_seq, y_pred_train)
-val_mse = mean_squared_error(y_val_seq, y_pred_val)
-test_mse = mean_squared_error(y_test_seq, y_pred_test)
-train_mae = mean_absolute_error(y_train_seq, y_pred_train)
-val_mae = mean_absolute_error(y_val_seq, y_pred_val)
-test_mae = mean_absolute_error(y_test_seq, y_pred_test)
+train_mse = mean_squared_error(y_train_scaled, y_pred_train)
+val_mse = mean_squared_error(y_val_scaled, y_pred_val)
+test_mse = mean_squared_error(y_test_scaled, y_pred_test)
+train_mae = mean_absolute_error(y_train_scaled, y_pred_train)
+val_mae = mean_absolute_error(y_val_scaled, y_pred_val)
+test_mae = mean_absolute_error(y_test_scaled, y_pred_test)
 
 print("\n" + "="*50)
 print("BASELINE: LINEAR REGRESSION RESULTS")
@@ -108,7 +84,7 @@ print(f"    Feed Forward Val MSE:      0.20")
 print("-"*50)
 
 # Inverse transform for plotting
-y_test_inv = scaler_y.inverse_transform(y_test_seq)
+y_test_inv = scaler_y.inverse_transform(y_test_scaled)
 y_pred_inv = scaler_y.inverse_transform(y_pred_test)
 
 # Plot
