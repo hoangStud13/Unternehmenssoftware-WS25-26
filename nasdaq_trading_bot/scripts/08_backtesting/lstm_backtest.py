@@ -49,7 +49,7 @@ sys.path.insert(0, PROJECT_ROOT)
 FEATURES_PY_PATH = os.path.join(PROJECT_ROOT, "scripts", "03_pre_split_prep", "features.py")
 MODELS_DIR = os.path.join(PROJECT_ROOT, "models", "lstm")
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-RESULTS_DIR = os.path.join(PROJECT_ROOT, "results")
+RESULTS_DIR = os.path.join(PROJECT_ROOT, "images")
 
 # MUST match training
 FEATURE_LIST_PATH = os.path.join(MODELS_DIR, "features_clean.txt")
@@ -60,7 +60,7 @@ SCALER_X_PATH = os.path.join(DATA_DIR, "scaler_X.joblib")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # Load News Module
-NEWS_FEATURES_PATH = os.path.join(THIS_DIR, "news_features.py")
+NEWS_FEATURES_PATH = os.path.join(PROJECT_ROOT, "scripts", "07_deployment", "news_features.py")
 spec_news = importlib.util.spec_from_file_location("news_features_module", NEWS_FEATURES_PATH)
 news_features_module = importlib.util.module_from_spec(spec_news)
 spec_news.loader.exec_module(news_features_module)  # type: ignore
@@ -356,7 +356,7 @@ def run_backtest(days: int, sample_prints: int, save_csv: bool) -> None:
 
     # 10. Save & Plot
     if save_csv:
-        path = os.path.join(RESULTS_DIR, "backtest_results.csv")
+        path = os.path.join(RESULTS_DIR, "08_lstm_backtest_results.csv")
         df_res.to_csv(path, index=False)
         print(f"[SAVE] Results saved to {path}")
 
@@ -369,7 +369,7 @@ def run_backtest(days: int, sample_prints: int, save_csv: bool) -> None:
     plt.legend()
     plt.title("LSTM Backtest: Predicted vs True Returns (5m Horizon) - Last 300 pts")
     
-    plot_path = os.path.join(RESULTS_DIR, "backtest_plot.png")
+    plot_path = os.path.join(RESULTS_DIR, "08_lstm_backtest_plot.png")
     plt.savefig(plot_path)
     print(f"[PLOT] Saved to {plot_path}")
     # plt.show()
