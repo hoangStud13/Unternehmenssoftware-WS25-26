@@ -384,23 +384,19 @@ Das erste Modell, das wir testen ist ein klassisches Feedforward-Neural-Network 
 
 #### FFNN - actuals vs predicted (200 Data Points) 
 
-![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves.png)
+![](nasdaq_trading_bot/images/06_feed_forward_predictions_first_200.png)
 
-Bei 200 Datenpunkten folgt das MLP den Zielwerten für 1, 3 und 5 Minuten relativ eng, zeigt jedoch bei 10 und 15 Minuten deutlich größere Abweichungen und mehr Rauschen. Das Modell fängt also kurzfristige Muster gut ein, hat aber Probleme mit Amplitude und Timing bei längeren Vorhersagehorizonten.
-
-![](nasdaq_trading_bot/images/06_feed_forward_loss_curves.png)
-
-Die Trainingsverluste fallen schnell in den ersten Epochen und stabilisieren sich anschließend, während die Validierungsverluste kleine Schwankungen und einen Ausreißer zeigen. Da die Trainings- und Validierungsverluste eng beieinander liegen, spricht das gegen starkes Overfitting, allerdings macht das Rauschen der Validierungsverluste eine eindeutige Bewertung unsicher. Ein Validierungsverlust, der gelegentlich unter dem Trainingsverlust liegt, deutet auf mögliche Probleme bei der Loss‑Aggregation, ungleichgewichtiger Gewichtung pro Batch oder auf Datenleakage hin.
+Für die ersten 200 Samples folgt die Vorhersage für 3 und 5 Minuten im Großen und Ganzen der tatsächlichen Dynamik, ist aber glatter und leicht phasenverschoben. Bei 10 und 15 Minuten sind die Abweichungen deutlich größer; das Modell verpasst Spitzen und liefert geringere Amplituden.
 
 #### FFNN - acutuals vs predicted (all data points) 
 
-![](nasdaq_trading_bot/images/06_feed_forward_actual_vs_predicted_curves_relu.png)
+![](nasdaq_trading_bot/images/06_feed_forward_predictions_all.png)
 
 Über das gesamte Testset zeigt das Modell für die vielen kleinen Bewegungen eine gute Übereinstimmung zwischen Actual und Predicted, während extreme Ausschläge (große Spikes) nur teilweise erfasst werden. Das bedeutet, dass das Modell die typischen, häufigen Marktbewegungen gut abbildet, aber seltene, starke Bewegungen schwer vorhersagt.
 
-![](nasdaq_trading_bot/images/06_feed_forward_loss_curves_relu.png)
+![](nasdaq_trading_bot/images/06_feed_forward_loss.png)
 
-Bei Verwendung des gesamten Datensatzes und der ReLU‑Variante konvergiert das Modell zu stabilen Validierungsverlusten im Bereich von etwa 0.0037–0.0040 MSE, wobei nur kleine Schwankungen sichtbar sind. Insgesamt zeigen die Kurven Plateaus, was darauf hinweist, dass mit der gegebenen Feature‑Menge und Architektur nur begrenzte weitere Verbesserungen ohne Architekturumstellung oder zusätzliche Daten zu erwarten sind.
+Der Trainingsverlust fällt stetig, und der Validierungsverlust sinkt anfänglich und erreicht ein Plateau mit leichten Schwankungen. Es besteht kein klares Overfitting, vielmehr scheint das Modell an seiner Kapazitätsgrenze oder an fehlenden Informationen zu leiden.
 
 
 ### 6.2 RNN

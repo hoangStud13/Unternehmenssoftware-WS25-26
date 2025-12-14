@@ -15,3 +15,8 @@ hf_xet
 pyyaml
 django
 psutil
+dotenv
+joblib
+scikit-learn
+importlib
+pathlib
