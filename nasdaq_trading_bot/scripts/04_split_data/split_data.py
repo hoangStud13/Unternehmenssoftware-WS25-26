@@ -31,9 +31,16 @@ def split_data(features_file, data_dir, train_ratio=0.7, validation_ratio=0.15):
     print(f"Train: {len(train)}, Validation: {len(validation)}, Test: {len(test)}")
     print(f"Splits saved in {data_dir}")
 
-if __name__ == "__main__":
+
+
+
+
+def main():
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     data_dir = os.path.join(project_root, 'data')
     features_file = os.path.join(data_dir, 'nasdaq100_index_1m_features.parquet')
 
     split_data(features_file, data_dir)
+
+if __name__ == "__main__":
+    main()

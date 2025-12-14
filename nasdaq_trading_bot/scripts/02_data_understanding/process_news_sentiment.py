@@ -57,6 +57,12 @@ def get_sentiment(text, tokenizer, model, device):
 
 def process_news_sentiment():
     """Process all news items and add sentiment scores."""
+
+    # 🔒 Guard: Skip if already processed
+    if os.path.exists(output_file):
+        print(f"Sentiment file already exists, skipping step: {output_file}")
+        return
+
     print(f"Reading news from {input_file}...")
     df = pd.read_csv(input_file)
     
@@ -104,5 +110,10 @@ def process_news_sentiment():
     print(f"  Neutral:  {neutral} ({neutral/len(df)*100:.1f}%)")
     print(f"  Negative: {negative} ({negative/len(df)*100:.1f}%)")
 
-if __name__ == "__main__":
+
+
+def main():
     process_news_sentiment()
+
+if __name__ == "__main__":
+    main()

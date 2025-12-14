@@ -18,7 +18,7 @@ def run_script(name: str, relative_path: Path):
         raise RuntimeError(f"{name} hat keine main()-Funktion")
 
 def run_all_scripts():
-    model = input("Which model should run?"+"\n"+"1. LSTM"+"\n"+"2. RNN"+"\n"+"3. Feed_Forward"+"\n")
+    model = input("Which model should run?"+"\n"+"1. RNN"+"\n"+"2. LSTM"+"\n"+"3. Feed_Forward"+"\n")
     run_script(
         "fetch_nasdaq_index",
         Path("scripts/01_data_acquisition/fetch_nasdaq_index.py")
@@ -56,7 +56,7 @@ def run_all_scripts():
         )
         run_script(
             "model_training",
-            Path("scripts/07_employment/lstm_deploy.py")
+            Path("scripts/07_deployment/lstm_deploy.py")
         )
     else:
         run_script(
@@ -65,26 +65,22 @@ def run_all_scripts():
         )
         run_script(
             "model_training",
-            Path("scripts/07_employment/feed_forward_deploy.py")
+            Path("scripts/07_deployment/feed_forward_deploy.py")
         )
 
 def run_deployment():
-    model=input("Which model should run?"+"\n"+"1. RNN"+"\n"+"2. LSTM"+"\n"+"3. Feed_Forward"+"\n")
+    model=input("Which model should run?"+"\n"+"1. LSTM"+"\n"+"2. Feed_Forward")
     if model == "1":
         run_script(
             "model_training",
-            Path("scripts/07_employment/main.py")
+            Path("scripts/07_deployment/lstm_deploy.py")
         )
     elif model == "2":
         run_script(
             "model_training",
-            Path("scripts/07_employment/main.py")
+            Path("scripts/07_deployment/feed_forward_deploy.py")
         )
-    else:
-        run_script(
-            "model_training",
-            Path("scripts/07_employment/main.py")
-        )
+
 
 def run_data_pipeline():
     run_script("fetch_nasdaq_index", Path("scripts/01_data_acquisition/fetch_nasdaq_index.py"))
