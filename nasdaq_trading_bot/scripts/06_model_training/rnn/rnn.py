@@ -3,261 +3,229 @@ import matplotlib.pyplot as plt
 import torch
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 import torch.nn as nn
 import torch.optim as optim
-import joblib 
-
-class BasicRNN(nn.Module):
-    def __init__(self, input_size=15, hidden_size=64, num_layers=1, output_size=6):
-        super(BasicRNN, self).__init__()
-        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
-
-    def forward(self, x):
-        out, _ = self.rnn(x)
-        out = out[:, -1, :]  # Letzter Zeitschritt
-        return self.fc(out)
+import joblib
 
 
-def create_sequences(X, y, sequence_length=10):
-    """
-    Erstellt Sequenzen für RNN Training
-    X: Features (samples, features)
-    y: Targets (samples, outputs)
-    sequence_length: Anzahl der Zeitschritte
-    """
-    X_seq, y_seq = [], []
-    for i in range(len(X) - sequence_length):
-        X_seq.append(X[i:i + sequence_length])
-        y_seq.append(y[i + sequence_length])
-    return np.array(X_seq), np.array(y_seq)
+def main():
+    class BasicRNN(nn.Module):
+        def __init__(self, input_size=15, hidden_size=64, num_layers=1, output_size=6):
+            super(BasicRNN, self).__init__()
+            self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
+            self.fc = nn.Linear(hidden_size, output_size)
 
+        def forward(self, x):
+            out, _ = self.rnn(x)
+            out = out[:, -1, :]  # letzter Zeitschritt
+            return self.fc(out)
 
-# Pfade definieren
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-data_dir = os.path.join(project_root, 'data')
-models_dir = os.path.join(project_root, "models", "rnn")
-images_dir = os.path.join(project_root, "images")
+    def create_sequences(X, y, sequence_length=10):
+        X_seq, y_seq = [], []
+        for i in range(len(X) - sequence_length):
+            X_seq.append(X[i:i + sequence_length])
+            y_seq.append(y[i + sequence_length])
+        return np.array(X_seq), np.array(y_seq)
 
-os.makedirs(models_dir, exist_ok=True)
-os.makedirs(images_dir, exist_ok=True)
+    # -------------------------------
+    # Pfade
+    # -------------------------------
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+    data_dir = os.path.join(project_root, 'data')
+    models_dir = os.path.join(project_root, "models", "rnn")
+    images_dir = os.path.join(project_root, "images")
 
-# Prüfen ob Dateien existieren
-csv_files = ['X_train_scaled.csv', 'y_train.csv', 'X_test_scaled.csv', 'y_test.csv']
-files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in csv_files)
+    os.makedirs(models_dir, exist_ok=True)
+    os.makedirs(images_dir, exist_ok=True)
 
-# Wir erwarten jetzt diese Dateien aus Step 5:
-required_files = [
-    'X_train_scaled.csv', 'y_train_scaled.csv',
-    'X_val_scaled.csv',   'y_val_scaled.csv',
-    'X_test_scaled.csv',  'y_test_scaled.csv',
-    'scaler_y.joblib'
-]
-files_exist = all(os.path.exists(os.path.join(data_dir, f)) for f in required_files)
+    # -------------------------------
+    # Dateien prüfen
+    # -------------------------------
+    required_files = [
+        'X_train_scaled.csv', 'y_train_scaled.csv',
+        'X_val_scaled.csv',   'y_val_scaled.csv',
+        'X_test_scaled.csv',  'y_test_scaled.csv',
+        'scaler_y.joblib'
+    ]
 
-if not files_exist:
-    raise FileNotFoundError("Benötigte Dateien aus Step 5 fehlen. Bitte Step 5 zuerst ausführen.")
+    if not all(os.path.exists(os.path.join(data_dir, f)) for f in required_files):
+        raise FileNotFoundError("Benötigte Dateien aus Step 5 fehlen. Bitte Step 5 zuerst ausführen.")
 
-print("Lade Step-5-Daten...")
+    print("Lade Step-5-Daten...")
 
-X_train_scaled = pd.read_csv(
-    os.path.join(data_dir, 'X_train_scaled.csv'),
-    index_col=0
-).values
+    X_train_scaled = pd.read_csv(os.path.join(data_dir, 'X_train_scaled.csv'), index_col=0).values
+    y_train_scaled = pd.read_csv(os.path.join(data_dir, 'y_train_scaled.csv'), index_col=0).values
+    X_val_scaled   = pd.read_csv(os.path.join(data_dir, 'X_val_scaled.csv'),   index_col=0).values
+    y_val_scaled   = pd.read_csv(os.path.join(data_dir, 'y_val_scaled.csv'),   index_col=0).values
+    X_test_scaled  = pd.read_csv(os.path.join(data_dir, 'X_test_scaled.csv'),  index_col=0).values
+    y_test_scaled  = pd.read_csv(os.path.join(data_dir, 'y_test_scaled.csv'),  index_col=0).values
 
-y_train_scaled = pd.read_csv(
-    os.path.join(data_dir, 'y_train_scaled.csv'),
-    index_col=0
-).values
+    print(f"Shapes:")
+    print(f"  X_train_scaled: {X_train_scaled.shape}, y_train_scaled: {y_train_scaled.shape}")
+    print(f"  X_val_scaled:   {X_val_scaled.shape},   y_val_scaled:   {y_val_scaled.shape}")
+    print(f"  X_test_scaled:  {X_test_scaled.shape},  y_test_scaled:  {y_test_scaled.shape}")
 
-X_val_scaled = pd.read_csv(
-    os.path.join(data_dir, 'X_val_scaled.csv'),
-    index_col=0
-).values
+    scaler_y = joblib.load(os.path.join(data_dir, "scaler_y.joblib"))
 
-y_val_scaled = pd.read_csv(
-    os.path.join(data_dir, 'y_val_scaled.csv'),
-    index_col=0
-).values
+    # -------------------------------
+    # Sequenzen
+    # -------------------------------
+    sequence_length = 10
+    X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
+    X_val_seq,   y_val_seq   = create_sequences(X_val_scaled,   y_val_scaled,   sequence_length)
+    X_test_seq,  y_test_seq  = create_sequences(X_test_scaled,  y_test_scaled,  sequence_length)
 
-X_test_scaled = pd.read_csv(
-    os.path.join(data_dir, 'X_test_scaled.csv'),
-    index_col=0
-).values
+    print("\nSequenz-Shapes:")
+    print(f"X_train_seq: {X_train_seq.shape}")
+    print(f"y_train_seq: {y_train_seq.shape}")
+    print(f"X_val_seq:   {X_val_seq.shape}")
+    print(f"y_val_seq:   {y_val_seq.shape}")
+    print(f"X_test_seq:  {X_test_seq.shape}")
+    print(f"y_test_seq:  {y_test_seq.shape}")
 
-y_test_scaled = pd.read_csv(
-    os.path.join(data_dir, 'y_test_scaled.csv'),
-    index_col=0
-).values
+    # -------------------------------
+    # Tensoren
+    # -------------------------------
+    X_train_tensor = torch.FloatTensor(X_train_seq)
+    y_train_tensor = torch.FloatTensor(y_train_seq)
+    X_val_tensor   = torch.FloatTensor(X_val_seq)
+    y_val_tensor   = torch.FloatTensor(y_val_seq)
+    X_test_tensor  = torch.FloatTensor(X_test_seq)
+    y_test_tensor  = torch.FloatTensor(y_test_seq)
 
-print(f"Shapes:")
-print(f"  X_train_scaled: {X_train_scaled.shape}, y_train_scaled: {y_train_scaled.shape}")
-print(f"  X_val_scaled:   {X_val_scaled.shape},   y_val_scaled:   {y_val_scaled.shape}")
-print(f"  X_test_scaled:  {X_test_scaled.shape},  y_test_scaled:  {y_test_scaled.shape}")
+    # -------------------------------
+    # Modell
+    # -------------------------------
+    n_features = X_train_scaled.shape[1]
+    n_outputs  = y_train_scaled.shape[1]
 
-# y-Scaler laden für späteres inverse_transform
-scaler_y = joblib.load(os.path.join(data_dir, "scaler_y.joblib"))
+    model = BasicRNN(
+        input_size=n_features,
+        hidden_size=64,
+        num_layers=2,
+        output_size=n_outputs
+    )
 
-# Sequenzen erstellen
-sequence_length = 10
-X_train_seq, y_train_seq = create_sequences(X_train_scaled, y_train_scaled, sequence_length)
-X_val_seq, y_val_seq = create_sequences(X_val_scaled, y_val_scaled, sequence_length)
-X_test_seq, y_test_seq = create_sequences(X_test_scaled, y_test_scaled, sequence_length)
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-print(f"\nSequenz-Shapes:")
-print(f"X_train_seq shape: {X_train_seq.shape}")  # (samples, seq_length, features)
-print(f"y_train_seq shape: {y_train_seq.shape}")  # (samples, outputs)
-print(f"X_val_seq shape: {X_val_seq.shape}")
-print(f"y_val_seq shape: {y_val_seq.shape}")
-print(f"X_test_seq shape: {X_test_seq.shape}")
-print(f"y_test_seq shape: {y_test_seq.shape}")
+    EPOCHS = 100
+    patience = 10
 
-# Zu PyTorch Tensoren konvertieren
-X_train_tensor = torch.FloatTensor(X_train_seq)
-y_train_tensor = torch.FloatTensor(y_train_seq)
-X_val_tensor = torch.FloatTensor(X_val_seq)
-y_val_tensor = torch.FloatTensor(y_val_seq)
-X_test_tensor = torch.FloatTensor(X_test_seq)
-y_test_tensor = torch.FloatTensor(y_test_seq)
+    losses_train = []
+    losses_val = []
 
-# Model initialisieren
-n_features = X_train_scaled.shape[1]
-n_outputs = y_train_scaled.shape[1]
+    best_val_loss = float('inf')
+    patience_counter = 0
+    best_model_state = None
 
-model = BasicRNN(input_size=n_features, hidden_size=64, num_layers=2, output_size=n_outputs)
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+    # -------------------------------
+    # Training
+    # -------------------------------
+    print("\nTraining startet...")
+    for epoch in range(EPOCHS):
+        model.train()
+        output = model(X_train_tensor)
+        loss = criterion(output, y_train_tensor)
 
-EPOCHS = 100
-losses_train = []
-losses_val = []
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-# Early Stopping Parameter
-patience = 10
-best_val_loss = float('inf')
-patience_counter = 0
-best_model_state = None
+        losses_train.append(loss.item())
 
-print("\nTraining startet...")
-for epoch in range(EPOCHS):
-    # ----- Training -----
-    model.train()
+        model.eval()
+        with torch.no_grad():
+            val_output = model(X_val_tensor)
+            val_loss = criterion(val_output, y_val_tensor)
 
-    # Forward pass
-    output = model(X_train_tensor)
-    loss = criterion(output, y_train_tensor)
+        losses_val.append(val_loss.item())
 
-    # Backward pass
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+        if (epoch + 1) % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{EPOCHS}] | Train: {loss.item():.4f} | Val: {val_loss.item():.4f}")
 
-    losses_train.append(loss.item())
+        if val_loss.item() < best_val_loss:
+            best_val_loss = val_loss.item()
+            patience_counter = 0
+            best_model_state = model.state_dict()
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print(f"\n>>> Early Stopping bei Epoch {epoch + 1} <<<")
+                break
 
-    # ----- Validation -----
+    if best_model_state is not None:
+        model.load_state_dict(best_model_state)
+        print(f"\nBestes Modell mit Val Loss: {best_val_loss:.4f} geladen.")
+
+    # -------------------------------
+    # Evaluation
+    # -------------------------------
     model.eval()
     with torch.no_grad():
-        val_output = model(X_val_tensor)
-        val_loss = criterion(val_output, y_val_tensor)
-    
-    losses_val.append(val_loss.item())
+        predictions = model(X_test_tensor).numpy()
 
-    if (epoch + 1) % 10 == 0:
-        print(f"Epoch [{epoch + 1}/{EPOCHS}], Train Loss: {loss.item():.4f}, Val Loss: {val_loss.item():.4f}")
-    
-    # Early Stopping
-    if val_loss.item() < best_val_loss:
-        best_val_loss = val_loss.item()
-        patience_counter = 0
-        best_model_state = model.state_dict()
-    else:
-        patience_counter += 1
-        if patience_counter >= patience:
-            print(f"\n>>> Early Stopping ausgelöst bei Epoch {epoch + 1}! <<<")
-            break
+    try:
+        y_test_inv = scaler_y.inverse_transform(y_test_seq)
+        predictions_inv = scaler_y.inverse_transform(predictions)
+    except Exception as e:
+        print(f"Inverse transform fehlgeschlagen: {e}")
+        y_test_inv = y_test_seq
+        predictions_inv = predictions
 
-# Laden des besten Modells
-if best_model_state is not None:
-    model.load_state_dict(best_model_state)
-    print(f"\nBestes Modell mit Val Loss: {best_val_loss:.4f} geladen.")
+    # -------------------------------
+    # Plot
+    # -------------------------------
+    fig, axes = plt.subplots(3, 2, figsize=(15, 12))
+    fig.suptitle('RNN Predictions vs Actual Values')
 
-# Evaluation
-model.eval()
-with torch.no_grad():
-    predictions = model(X_test_tensor).numpy()
+    n_outputs_to_plot = min(6, y_test_inv.shape[1])
+    for i in range(n_outputs_to_plot):
+        ax = axes[i // 2, i % 2]
+        ax.plot(y_test_inv[:100, i], label='Actual')
+        ax.plot(predictions_inv[:100, i], label='Predicted', linestyle='--')
+        ax.set_title(f'Output {i + 1}')
+        ax.legend()
+        ax.grid(True)
 
-# Rücktransformation
-try:
-    y_test_inv = scaler_y.inverse_transform(y_test_seq)
-    predictions_inv = scaler_y.inverse_transform(predictions)
-    print(f"Inverse transform erfolgreich: y_test_inv shape={y_test_inv.shape}, predictions_inv shape={predictions_inv.shape}")
-except Exception as e:
-    print(f"FEHLER bei inverse_transform: {e}")
-    y_test_inv = y_test_seq
-    predictions_inv = predictions
-
-# Visualisierung
-fig, axes = plt.subplots(3, 2, figsize=(15, 12))
-fig.suptitle('RNN Predictions vs Actual Values')
-
-# Plotte alle Outputs
-n_outputs_to_plot = min(6, y_test_inv.shape[1])
-for i in range(n_outputs_to_plot):
-    ax = axes[i // 2, i % 2]
-    ax.plot(y_test_inv[:100, i], label='Actual', linewidth=2)
-    ax.plot(predictions_inv[:100, i], label='Predicted', linewidth=2, alpha=0.7)
-    ax.set_title(f'Output {i + 1}')
-    ax.set_xlabel('Time Step')
-    ax.set_ylabel('Value')
-    ax.legend()
-    ax.grid(True)
-
-# Loss Plot
-if n_outputs_to_plot < 6:
     epochs_range = range(1, len(losses_train) + 1)
     axes[2, 1].plot(epochs_range, losses_train, label='Train Loss')
     axes[2, 1].plot(epochs_range, losses_val, label='Val Loss')
-    axes[2, 1].set_title('Training & Validation Loss')
-    axes[2, 1].set_xlabel('Epoch')
-    axes[2, 1].set_ylabel('MSE Loss')
     axes[2, 1].legend()
     axes[2, 1].grid(True)
-else:
-    # Falls wir 6 Outputs haben, entferne leere Subplots
-    fig.delaxes(axes[2, 1])
 
-plt.tight_layout()
-plt.show()
-plot_path = os.path.join(images_dir, "06_rnn_results.png")
-fig.savefig(plot_path, dpi=200)
-print(f"Plot gespeichert unter: {plot_path}")
+    plt.tight_layout()
+    plot_path = os.path.join(images_dir, "06_rnn_results.png")
+    fig.savefig(plot_path, dpi=200)
+    print(f"Plot gespeichert unter: {plot_path}")
 
-# Finale Test-Metrik berechnen
-print(f"\nDebug: predictions shape={predictions.shape}, predictions contains NaN: {np.isnan(predictions).any()}")
-print(f"Debug: y_test_seq shape={y_test_seq.shape}, y_test_seq contains NaN: {np.isnan(y_test_seq).any()}")
-print(f"Debug: predictions_inv contains NaN: {np.isnan(predictions_inv).any()}")
-print(f"Debug: y_test_inv contains NaN: {np.isnan(y_test_inv).any()}")
+    # -------------------------------
+    # Metriken
+    # -------------------------------
+    test_mse_scaled = criterion(
+        torch.FloatTensor(predictions),
+        torch.FloatTensor(y_test_seq)
+    ).item()
 
-test_mse_scaled = criterion(torch.FloatTensor(predictions), torch.FloatTensor(y_test_seq)).item()
-test_mse_original = np.mean((predictions_inv - y_test_inv) ** 2)
+    test_mse_original = np.mean((predictions_inv - y_test_inv) ** 2)
 
-print("\n" + "="*50)
-print("Training abgeschlossen!")
-print("="*50)
-print(f"Finale Train Loss (scaled): {losses_train[-1]:.4f}")
-print(f"Finale Val Loss (scaled):   {best_val_loss:.4f}")
-print(f"Test MSE (scaled):          {test_mse_scaled:.4f}")
-print(f"Test MSE (original scale):  {test_mse_original:.4f}")
-print("="*50)
+    print("\n" + "=" * 50)
+    print("Training abgeschlossen!")
+    print("=" * 50)
+    print(f"Finale Train Loss (scaled): {losses_train[-1]:.4f}")
+    print(f"Finale Val Loss (scaled):   {best_val_loss:.4f}")
+    print(f"Test MSE (scaled):          {test_mse_scaled:.4f}")
+    print(f"Test MSE (original scale):  {test_mse_original:.4f}")
+    print("=" * 50)
 
-# -------------------------------
-# Modell speichern
-# -------------------------------
+    # -------------------------------
+    # Modell speichern
+    # -------------------------------
+    model_path = os.path.join(models_dir, "best_rnn_model.pth")
+    torch.save(model.state_dict(), model_path)
+    print(f"\nModell gespeichert unter: {model_path}")
 
-model_path = os.path.join(models_dir, "best_rnn_model.pth")
-torch.save(model.state_dict(), model_path)
 
-print(f"\nModell gespeichert unter: {model_path}")
+if __name__ == "__main__":
+    main()

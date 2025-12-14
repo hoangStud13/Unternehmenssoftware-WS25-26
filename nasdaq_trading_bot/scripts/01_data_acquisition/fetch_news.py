@@ -107,5 +107,8 @@ def fetch_news_raw():
     print(f"\nSUCCESS: Finished fetching. Total items: {total_fetched}")
     print(f"Saved to {output_file}")
 
-if __name__ == "__main__":
+def main():
     fetch_news_raw()
+
+if __name__ == "__main__":
+    main()
