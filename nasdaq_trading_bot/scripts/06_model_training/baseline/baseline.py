@@ -78,9 +78,9 @@ print("="*50)
 # Comparison with other models (using Val MSE for fair comparison)
 print("\n>>> VALIDATION MSE COMPARISON:")
 print(f"    Linear Regression Val MSE: {val_mse:.4f}")
-print(f"    RNN Val MSE:               0.50")
-print(f"    LSTM Val MSE:              0.33")
-print(f"    Feed Forward Val MSE:      0.20")
+print(f"    RNN Val MSE:               0.787")
+print(f"    LSTM Val MSE:              0.787")
+print(f"    Feed Forward Val MSE:      0.785")
 print("-"*50)
 
 # Inverse transform for plotting
@@ -107,7 +107,7 @@ for i, name in enumerate(target_names):
 # Bar chart comparison in last subplot
 ax = axes[1, 2]
 models = ['Linear\nBaseline', 'RNN', 'LSTM', 'Feed Forward']
-mses = [val_mse, 0.50, 0.33, 0.20]  # Using Val MSE for comparison
+mses = [val_mse, 0.787, 0.787, 0.785]  # Using Val MSE for comparison
 colors = ['orange', 'blue', 'green', 'purple']
 bars = ax.bar(models, mses, color=colors, alpha=0.8, edgecolor='black')
 ax.set_ylabel('Validation MSE')
