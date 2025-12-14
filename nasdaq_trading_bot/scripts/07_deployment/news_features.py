@@ -97,7 +97,7 @@ class NewsFeatureProvider:
 
     def _fetch_latest_news(self, tickers: list = None, topics: list = None) -> pd.DataFrame:
         if tickers is None and topics is None:
-            topics = ["technology", "financial_markets"]
+            tickers = ["QQQ"]
 
         print(f"[NEWS] Fetching latest news (topics: {topics}, tickers: {tickers})...")
 
@@ -169,6 +169,12 @@ class NewsFeatureProvider:
                 f"[NEWS] Sentiment stats: mean={df['sentiment_score'].mean():.3f}, "
                 f"std={df['sentiment_score'].std():.3f}"
             )
+            
+            print("-" * 60)
+            print("INDIVIDUAL NEWS LOGS:")
+            for i, row in df.iterrows():
+                print(f"  [{row['timestamp']}] Sentiment={row['sentiment_score']:.4f} | {row['headline']}")
+            print("-" * 60)
 
             df = df.sort_values("timestamp", ascending=False).reset_index(drop=True)
             return df
