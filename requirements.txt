@@ -20,3 +20,4 @@ joblib
 scikit-learn
 importlib
 pathlib
+yfinance
