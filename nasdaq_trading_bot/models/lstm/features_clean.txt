@@ -1,0 +1,14 @@
+simple_return_1m
+simple_return_5m
+simple_return_15m
+ema_5
+ema_20
+ema_diff
+volume
+volume_zscore_30m
+realized_volatility
+avg_volume_per_trade
+hl_span
+last_news_sentiment
+news_age_minutes
+effective_sentiment_t
