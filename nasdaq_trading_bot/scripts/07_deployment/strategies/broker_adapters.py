@@ -173,8 +173,8 @@ class AlpacaBroker(BrokerInterface):
             for c in calendar:
                 result.append({
                     "date": str(c.date),
-                    "open": str(c.open),
-                    "close": str(c.close)
+                    "open": c.open.strftime("%H:%M"),
+                    "close": c.close.strftime("%H:%M")
                 })
             return result
         except Exception as e:
