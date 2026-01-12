@@ -37,11 +37,6 @@ Hier erfolgt die technische Anbindung an die externen APIs.
     *   Unterstützt "Bracket Orders" (Entry + Stop-Loss + Take-Profit in einem Request).
     *   Verarbeitet Paper- und Live-Trading.
 
-*   **`OANDABroker`:**
-    *   Implementiert `BrokerInterface` für **OANDA** (CFDs/Forex).
-    *   Behandelt die Besonderheiten von CFDs (z.B. negative Units für Short-Positionen, separate Long/Short-Positionen im Account).
-    *   Unterstützt Practice- und Live-Trading.
-
 *   **Factory `create_broker`:**
     *   Erstellt automatisch die richtige Broker-Instanz basierend auf der Konfiguration (`api_type`).
 
@@ -65,16 +60,16 @@ Hier befindet sich die eigentliche Handelslogik. Wir haben drei Varianten implem
     *   Sobald sich der Wind dreht und die Prognosen wieder positiv werden, steigt sie sofort aus, um Verluste zu begrenzen.
     *   *Ziel:* Gewinne in Bärenmärkten oder Korrekturen mitnehmen.
 
-#### C. `CFDLeveragedStrategy` (Der Profi mit Hebel)
-*   **Was sie tut:** Sie handelt in beide Richtungen (rauf und runter) und nutzt dabei einen "Hebel" (Leverage), um kleine Kursbewegungen stärker zu nutzen.
-*   **Wie sie denkt:**
-    *   Sie ist aggressiver und nutzt CFDs (Differenzkontrakte).
-    *   **Intelligentes Risiko:** Wenn der Markt gerade sehr wild schwankt ("hohe Volatilität"), reduziert sie automatisch ihren Einsatz, um nicht ausgeknockt zu werden.
-    *   **Hebel:** Ein Hebel von z.B. 20x bedeutet, dass 1% Kursbewegung wie 20% Gewinn (oder Verlust) wirken. Daher hält sie Positionen oft nur sehr kurz.
-    *   *Ziel:* Maximale Ausnutzung kleiner Bewegungen, aber mit eingebauter "Sicherheitsbremse" bei Chaos am Markt.
 
 ## Zusammenfassung der Neuerungen
 
 1.  **Modularität:** Das System ist nicht mehr an einen Broker gebunden.
 2.  **Risikomanagement:** Cooldowns, maximale Haltedauer und Stop-Loss-Logik sind fest integriert.
 3.  **Flexibilität:** Neue Strategien können einfach durch Erben von `TradingStrategy` hinzugefügt werden.
+
+- Overall Performance: 
+  - Total Trades: 4 
+  - Win Rate: 25% (1 Gewinner, 3 Verlierer)
+  - Total PnL: −35.70 
+  - Final Equity: 99,964.30 (Startkapital: 100,000)
+![backtest_lstm.png](../../images/backtest_lstm.png)
